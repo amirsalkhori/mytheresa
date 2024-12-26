@@ -38,6 +38,7 @@ func StartApplication() {
 	r.POST("/products", productHandler.CreateProduct)
 	r.GET("/products", productHandler.GetFilteredProducts)
 	r.POST("/discounts", discountHandler.CreateDiscount)
+	r.GET("/discounts", discountHandler.GetDiscount)
 
 	if err := r.Run(":8080"); err != nil {
 		log.Fatalf("failed to start server: %v", err)
