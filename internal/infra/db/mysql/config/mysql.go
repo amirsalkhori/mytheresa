@@ -9,7 +9,9 @@ import (
 
 	"github.com/golang-migrate/migrate/v4"
 	mysqlMigrate "github.com/golang-migrate/migrate/v4/database/mysql"
+	_ "github.com/golang-migrate/migrate/v4/source/file" // Importing the file source driver
 	"gorm.io/driver/mysql"
+
 	"gorm.io/gorm"
 )
 
@@ -17,11 +19,11 @@ type MySQLRepository struct {
 	DB *gorm.DB
 }
 
-func NewMySQLRepository(cfg *configs.Config, encryptionKey string) (*MySQLRepository, error) {
+func NewMySQLRepository(cfg *configs.Config) (*MySQLRepository, error) {
 	// Run migrations
-	if err := runMigrations(&cfg.Mysql); err != nil {
-		return nil, err
-	}
+	// if err := runMigrations(&cfg.Mysql); err != nil {
+	// 	return nil, err
+	// }
 
 	dsn := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8&parseTime=True&loc=Local",
 		cfg.Mysql.User,
@@ -44,7 +46,7 @@ func NewMySQLRepository(cfg *configs.Config, encryptionKey string) (*MySQLReposi
 }
 
 func migrationsPath() string {
-	return "file:./migrations"
+	return "file://./migrations"
 }
 
 func runMigrations(cfg *configs.Mysql) error {
@@ -73,7 +75,7 @@ func runMigrations(cfg *configs.Mysql) error {
 		migrationsPath(),
 		"mysql", driver)
 	if err != nil {
-		panic(err)
+		return fmt.Errorf("failed to create migration instance: %w", err)
 	}
 
 	// Run migrations
