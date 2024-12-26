@@ -1,6 +1,6 @@
 package derrors
 
 var (
-	ErrDatabaseIssue        = baseError{code: CodeDBIsDown}
-	ErrOrderProductNotFound = baseError{code: ProductNotFound}
+	ErrDatabaseIssue   = baseError{code: CodeDBIsDown}
+	ErrProductNotFound = baseError{code: ProductNotFound}
 )

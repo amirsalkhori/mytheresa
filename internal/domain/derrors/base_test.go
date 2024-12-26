@@ -9,5 +9,5 @@ import (
 
 func TestEquality(t *testing.T) {
 	err1 := ErrDatabaseIssue
-	assert.False(t, errors.Is(err1, ErrOrderProductNotFound))
+	assert.False(t, errors.Is(err1, ErrProductNotFound))
 }

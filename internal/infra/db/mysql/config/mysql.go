@@ -35,6 +35,7 @@ func NewMySQLRepository(cfg *configs.Config) (*MySQLRepository, error) {
 
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	if err != nil {
+		log.Fatal("Error connecting to MySQL:", err)
 		return nil, err
 	}
 
