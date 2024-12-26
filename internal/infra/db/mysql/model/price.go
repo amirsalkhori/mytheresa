@@ -4,8 +4,8 @@ import "mytheresa/internal/domain"
 
 type Price struct {
 	ID                 uint32  `gorm:"primaryKey;autoIncrement"`
-	Original           uint32  `gorm:"not null"`
-	Final              uint32  `gorm:"not null"`
+	Original           uint32  `gorm:"index;not null"`
+	Final              uint32  `gorm:"index;not null"`
 	DiscountPercentage *string `gorm:"not null"`
 	Currency           string  `gorm:"type:varchar(10);not null"`
 	ProductID          uint32  `gorm:"not null"`

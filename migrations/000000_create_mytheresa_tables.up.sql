@@ -1,23 +1,26 @@
-create table products
+CREATE TABLE products
 (
-    id                    int unsigned auto_increment
-        primary key,
-    sku         varchar(255) not null,
-    name         varchar(255) not null,
-    category         varchar(255) not null,
-    created_at            timestamp                                           null,
-    updated_at            timestamp                                           null
+    id          INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    sku         VARCHAR(255) NOT NULL,
+    name        VARCHAR(255) NOT NULL,
+    category    VARCHAR(255) NOT NULL,
+    created_at  TIMESTAMP NULL,
+    updated_at  TIMESTAMP NULL,
+    INDEX idx_sku (sku),            
+    INDEX idx_name (name),             
+    INDEX idx_category (category)        
 );
 
-create table prices
+CREATE TABLE prices
 (
-    id                   int unsigned auto_increment
-        primary key,
-    product_id             int unsigned   not null,
-    original             int unsigned   not null,
-    final int unsigned not null,
-    discount_percentage  VARCHAR(10) NULL,
-    currency VARCHAR(10) not null,
-    constraint fk_products_price
-        foreign key (product_id) references products (id)
+    id                    INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    product_id            INT UNSIGNED NOT NULL,
+    original              INT UNSIGNED NOT NULL,
+    final                 INT UNSIGNED NOT NULL,
+    discount_percentage   VARCHAR(10) NULL,
+    currency              VARCHAR(10) NOT NULL,
+    CONSTRAINT fk_products_price
+        FOREIGN KEY (product_id) REFERENCES products (id),
+    INDEX idx_original (original),       
+    INDEX idx_final (final)             
 );
