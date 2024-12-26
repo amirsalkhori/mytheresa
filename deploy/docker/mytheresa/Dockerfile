@@ -16,6 +16,10 @@ RUN echo "start build"
 WORKDIR /app/cmd
 RUN go build -o /app/main .
 
+# Copy migration files from the root directory
+WORKDIR /home/app
+COPY ./migrations /home/app/migrations
+
 # Verify the binary is created
 RUN ls -la $BIN
 RUN echo "Build successful"
