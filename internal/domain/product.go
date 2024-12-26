@@ -9,7 +9,7 @@ type Product struct {
 	Currency string
 }
 
-type ProductResponse struct {
+type ProductDiscount struct {
 	SKU      string
 	Name     string
 	Category string

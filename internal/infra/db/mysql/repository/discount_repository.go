@@ -27,7 +27,7 @@ func (r DiscountRepository) CreateDiscount(ctx context.Context, disocunt domain.
 	return model.ToDomainDiscount(modelDiscount), nil
 }
 
-func (r DiscountRepository) GetDiscount(ctx context.Context, sku, category string) (domain.Discount, error) {
+func (r DiscountRepository) GetDiscountsBySKUAndCategory(ctx context.Context, sku, category string) (domain.Discount, error) {
 	var modelDiscount model.Discount
 
 	query := r.DB.WithContext(ctx)
