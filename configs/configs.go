@@ -10,6 +10,7 @@ import (
 type Config struct {
 	App   App   `yaml:"app" mapstructure:"app"`
 	Mysql Mysql `yaml:"mysql" mapstructure:"mysql"`
+	Redis Redis `mapstructure:"redis"`
 }
 
 type App struct {
@@ -22,6 +23,12 @@ type Mysql struct {
 	User string `yaml:"username" mapstructure:"username"`
 	Name string `yaml:"database" mapstructure:"database"`
 	Pass string `yaml:"password" mapstructure:"password"`
+}
+
+type Redis struct {
+	Host     string `mapstructure:"host"`
+	Port     int    `mapstructure:"port"`
+	Password string `mapstructure:"password"`
 }
 
 func GetConfig() Config {
@@ -54,6 +61,9 @@ func bindEnv(v *viper.Viper) {
 		"mysql.username": "MYTHERESA_MYSQL_USER",
 		"mysql.password": "MYTHERESA_MYSQL_PASSWORD",
 		"mysql.database": "MYTHERESA_MYSQL_DB",
+		"redis.host":     "MYTHERESA_REDIS_HOST",
+		"redis.port":     "MYTHERESA_REDIS_PORT",
+		"redis.password": "MYTHERESA_REDIS_PASSWORD",
 	}
 
 	for key, env := range envBindings {

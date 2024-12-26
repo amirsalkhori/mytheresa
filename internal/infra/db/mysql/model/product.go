@@ -7,7 +7,8 @@ type Product struct {
 	SKU      string `gorm:"index;type:varchar(255);not null"`
 	Name     string `gorm:"index;type:varchar(255);not null"`
 	Category string `gorm:"index;type:varchar(255);not null"`
-	Price    Price
+	Price    uint32 `gorm:"index;not null"`
+	Currency string `gorm:"type:varchar(10);not null"`
 }
 
 func (Product) TableName() string {
@@ -20,7 +21,8 @@ func ToModelProduct(domainProduct domain.Product) Product {
 		SKU:      domainProduct.SKU,
 		Name:     domainProduct.Name,
 		Category: domainProduct.Category,
-		Price:    ToModelPrice(domainProduct.Price),
+		Currency: domainProduct.Currency,
+		Price:    domainProduct.Price,
 	}
 }
 
@@ -30,7 +32,8 @@ func ToDomainProduct(modelProduct Product) domain.Product {
 		SKU:      modelProduct.SKU,
 		Name:     modelProduct.Name,
 		Category: modelProduct.Category,
-		Price:    ToDomainPrice(modelProduct.Price),
+		Currency: modelProduct.Currency,
+		Price:    modelProduct.Price,
 	}
 }
 

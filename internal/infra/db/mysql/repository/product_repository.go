@@ -31,14 +31,14 @@ func (r ProductRepository) CreateProduct(ctx context.Context, product domain.Pro
 func (r ProductRepository) ListProducts(ctx context.Context, filters map[string]interface{}, pageSize, page int) ([]domain.Product, domain.Pagination, error) {
 	var modelProducts []model.Product
 	var totalCount int64
-	query := r.DB.Model(&model.Product{}).Joins("JOIN prices ON prices.product_id = products.id").Preload("Price")
+	query := r.DB.Model(&model.Product{})
 
 	if category, ok := filters["category"]; ok {
 		query = query.Where("products.category = ?", category)
 	}
 
-	if finalPrice, ok := filters["priceLessThan"]; ok {
-		query = query.Where("prices.final < ?", finalPrice)
+	if price, ok := filters["priceLessThan"]; ok {
+		query = query.Where("products.price < ?", price)
 	}
 	if err := query.Count(&totalCount).Error; err != nil {
 		log.Fatal("Error while counting the rows", err)

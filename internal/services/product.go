@@ -19,5 +19,8 @@ func (s *ProductService) CreateProduct(ctx context.Context, product domain.Produ
 }
 
 func (s ProductService) ListProducts(ctx context.Context, filters map[string]interface{}, pageSize, page int) ([]domain.Product, domain.Pagination, error) {
-	return s.Repo.ListProducts(ctx, filters, pageSize, page)
+	products, pagination, err := s.Repo.ListProducts(ctx, filters, pageSize, page)
+	// discounted := ApplyDiscounts(products)
+
+	return products, pagination, err
 }
