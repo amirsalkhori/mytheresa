@@ -31,7 +31,7 @@ func (r ProductRepository) CreateProduct(ctx context.Context, product domain.Pro
 func (r ProductRepository) ListProducts(ctx context.Context, filters map[string]interface{}, pageSize, page int) ([]domain.Product, domain.Pagination, error) {
 	var modelProducts []model.Product
 	var totalCount int64
-	query := r.DB.Model(&model.Product{}).Joins("JOIN prices ON prices.product_id = products.id")
+	query := r.DB.Model(&model.Product{}).Joins("JOIN prices ON prices.product_id = products.id").Preload("Price")
 
 	if category, ok := filters["category"]; ok {
 		query = query.Where("products.category = ?", category)
@@ -46,8 +46,6 @@ func (r ProductRepository) ListProducts(ctx context.Context, filters map[string]
 	}
 
 	offset := (page - 1) * pageSize
-	query = query.Limit(pageSize).Offset(offset)
-
 	query = query.Limit(pageSize).Offset(offset)
 
 	err := query.Find(&modelProducts).Error
