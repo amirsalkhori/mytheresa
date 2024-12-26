@@ -3,12 +3,12 @@ package model
 import "mytheresa/internal/domain"
 
 type Price struct {
-	ID                 uint32 `gorm:"primaryKey;autoIncrement"`
-	Original           uint32 `gorm:"not null"`
-	Final              uint32 `gorm:"not null"`
-	DiscountPercentage uint8  `gorm:"not null"`
-	Currency           string `gorm:"type:varchar(10);not null"`
-	ProductID          uint32 `gorm:"not null"`
+	ID                 uint32  `gorm:"primaryKey;autoIncrement"`
+	Original           uint32  `gorm:"not null"`
+	Final              uint32  `gorm:"not null"`
+	DiscountPercentage *string `gorm:"not null"`
+	Currency           string  `gorm:"type:varchar(10);not null"`
+	ProductID          uint32  `gorm:"not null"`
 }
 
 func (Price) TableName() string {

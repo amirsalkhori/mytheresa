@@ -16,7 +16,7 @@ create table prices
     product_id             int unsigned   not null,
     original             int unsigned   not null,
     final int unsigned not null,
-    discount_percentage TINYINT UNSIGNED not null,
+    discount_percentage  VARCHAR(10) NULL,
     currency VARCHAR(10) not null,
     constraint fk_products_price
         foreign key (product_id) references products (id)
