@@ -1,0 +1,42 @@
+version: '3.9'
+services:
+  app:
+     container_name: mytheresa-app
+     build:
+       context: .
+       dockerfile: ./deploy/docker/mytheresa/Dockerfile
+     ports:
+       - 8080:8080
+     volumes:
+       - .:/var/www/html 
+     depends_on:
+       - db
+       - redis 
+
+  db:
+    build:
+      context: .
+      dockerfile: ./deploy/docker/mysql/Dockerfile
+    container_name: mytheresa-mysql
+    environment:
+      - MYSQL_USER=mytheresa
+      - MYSQL_PASSWORD=mytheresa
+      - MYSQL_ROOT_PASSWORD=mytheresa
+      - MYSQL_DATABASE=mytheresa
+    ports:
+      - "13306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+  
+  redis:
+    container_name: mytheresa-redis
+    image: redis:7.0
+    environment:
+      - ALLOW_EMPTY_PASSWORD=no
+    ports:
+      - "127.0.0.1:16379:6379"
+    restart: always
+
+
+volumes:
+  mysql-data:
