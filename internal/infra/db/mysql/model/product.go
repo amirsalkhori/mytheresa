@@ -2,6 +2,8 @@ package model
 
 import "mytheresa/internal/domain"
 
+var Currency = "EUR"
+
 type Product struct {
 	ID       uint32 `gorm:"primaryKey;autoIncrement"`
 	SKU      string `gorm:"index;type:varchar(255);not null"`
@@ -21,7 +23,7 @@ func ToModelProduct(domainProduct domain.Product) Product {
 		SKU:      domainProduct.SKU,
 		Name:     domainProduct.Name,
 		Category: domainProduct.Category,
-		Currency: domainProduct.Currency,
+		Currency: Currency,
 		Price:    domainProduct.Price,
 	}
 }
