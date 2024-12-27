@@ -28,8 +28,8 @@ func StartApplication() {
 	productRepo := repository.NewProductRepository(db.DB)
 	discountRepo := repository.NewDiscountRepository(db.DB)
 
-	productService := services.NewProductService(productRepo)
 	disocuntService := services.NewDiscountService(discountRepo, redis)
+	productService := services.NewProductService(productRepo, disocuntService)
 
 	r := gin.Default()
 	productHandler := handler.NewProductHandler(productService)

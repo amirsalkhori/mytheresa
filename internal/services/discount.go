@@ -52,6 +52,9 @@ func (s *DiscountService) GetDiscount(ctx context.Context, sku, category string)
 		return domain.Discount{}, errors.New("unable to fetch discount from Redis and database")
 	}
 
+	if discount.ID == 0 {
+		return domain.Discount{}, nil
+	}
 	discountValue, _ := json.Marshal(discount)
 	_ = s.redis.Set(ctx, discountKey, discountValue, 0)
 

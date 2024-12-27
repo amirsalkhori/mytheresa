@@ -5,14 +5,17 @@ import (
 	"fmt"
 	"mytheresa/internal/domain"
 	"mytheresa/internal/ports"
+	"strconv"
+	"strings"
 )
 
 type ProductService struct {
-	Repo ports.ProductRepository
+	Repo            ports.ProductRepository
+	DiscountService ports.DiscountService
 }
 
-func NewProductService(repo ports.ProductRepository) ports.ProductService {
-	return &ProductService{Repo: repo}
+func NewProductService(repo ports.ProductRepository, discountService ports.DiscountService) ports.ProductService {
+	return &ProductService{Repo: repo, DiscountService: discountService}
 }
 
 func (s *ProductService) CreateProduct(ctx context.Context, product domain.Product) (domain.Product, error) {
@@ -30,11 +33,18 @@ func (s ProductService) ListProducts(ctx context.Context, filters map[string]int
 		var finalPrice = product.Price
 		var discountPercentage *string
 
-		if product.SKU == "000003" {
-			discountPercentage = applyDiscount(&finalPrice, 15)
-		}
-		if product.Category == "boots" {
-			discountPercentage = applyDiscount(&finalPrice, 30)
+		discount, err := s.DiscountService.GetDiscount(ctx, product.SKU, product.Category)
+		if err != nil || discount.ID == 0 {
+			discountPercentage = nil
+		} else {
+			discountPercentage = &discount.Percentage
+			// Convert the discount percentage string to an integer and apply the discount
+			percentage, err := parseDiscountPercentage(*discountPercentage)
+			if err != nil {
+				return nil, domain.Pagination{}, fmt.Errorf("invalid discount percentage: %v", err)
+			}
+			// Apply the discount to the price
+			finalPrice = applyDiscount(finalPrice, percentage)
 		}
 
 		discountedProduct := domain.ProductDiscount{
@@ -54,9 +64,24 @@ func (s ProductService) ListProducts(ctx context.Context, filters map[string]int
 	return discountedProducts, pagination, nil
 }
 
-func applyDiscount(price *uint32, percentage int) *string {
-	discount := (*price * uint32(percentage)) / 100
-	*price -= discount
-	discountString := fmt.Sprintf("%d%%", percentage)
-	return &discountString
+func applyDiscount(originalPrice uint32, discountPercentage int) uint32 {
+	discountAmount := (originalPrice * uint32(discountPercentage)) / 100
+	return originalPrice - discountAmount
+}
+
+func parseDiscountPercentage(discount string) (int, error) {
+	// Trim any whitespace and remove the "%" symbol
+	discount = strings.TrimSpace(discount)
+	if len(discount) == 0 || discount[len(discount)-1] != '%' {
+		return 0, fmt.Errorf("invalid discount format: missing '%' symbol")
+	}
+
+	// Remove the "%" and convert the remaining part to an integer
+	percentageStr := discount[:len(discount)-1]
+	percentage, err := strconv.Atoi(percentageStr)
+	if err != nil {
+		return 0, fmt.Errorf("invalid discount value: %v", err)
+	}
+
+	return percentage, nil
 }
