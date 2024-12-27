@@ -2,6 +2,7 @@ package services
 
 import (
 	"context"
+	"fmt"
 	"mytheresa/internal/domain"
 	"mytheresa/internal/ports"
 )
@@ -28,13 +29,14 @@ func (s ProductService) ListProducts(ctx context.Context, filters map[string]int
 
 	for _, product := range products {
 		var finalPrice = product.Price
-		var discountPercentage *uint8
+		var discountPercentage *string
 
 		discount, err := s.DiscountService.GetDiscount(ctx, product.SKU, product.Category)
 		if err != nil || discount.ID == 0 {
 			discountPercentage = nil
 		} else {
-			discountPercentage = &discount.Percentage
+			discountPercentageToString := fmt.Sprintf("%d%%", discount.Percentage)
+			discountPercentage = &discountPercentageToString
 			finalPrice = applyDiscount(finalPrice, discount.Percentage)
 		}
 		discountedProduct := domain.ProductDiscount{
