@@ -38,7 +38,7 @@ func (r ProductRepository) ListProducts(ctx context.Context, filters map[string]
 	}
 
 	if price, ok := filters["priceLessThan"]; ok {
-		query = query.Where("products.price < ?", price)
+		query = query.Where("products.price <= ?", price)
 	}
 	if err := query.Count(&totalCount).Error; err != nil {
 		log.Fatal("Error while counting the rows", err)
