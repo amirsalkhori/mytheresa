@@ -34,15 +34,14 @@ func (h *DiscountHandler) CreateDiscount(c *gin.Context) {
 }
 
 func (h *DiscountHandler) GetDiscount(c *gin.Context) {
-	sku := c.Query("sku")
-	category := c.Query("category")
+	identifier := c.Query("identifier")
 
-	if sku == "" && category == "" {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "At least one of SKU or category must be provided"})
+	if identifier == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "At least one of identifier must be provided"})
 		return
 	}
 
-	discount, err := h.service.GetDiscount(c.Request.Context(), sku, category)
+	discount, err := h.service.GetDiscount(c.Request.Context(), identifier)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch discount"})
 		return

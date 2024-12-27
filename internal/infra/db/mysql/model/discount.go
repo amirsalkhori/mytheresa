@@ -4,8 +4,8 @@ import "mytheresa/internal/domain"
 
 type Discount struct {
 	ID         uint32 `gorm:"primaryKey;autoIncrement"`
-	SKU        string `gorm:"index;type:varchar(255);not null"`
-	Category   string `gorm:"index;type:varchar(255);not null"`
+	Type       string `gorm:"type:ENUM('CATEGORY', 'SKU');"`
+	Identifier string `gorm:"index;type:varchar(50);not null"`
 	Percentage uint8  `gorm:"not null"`
 }
 
@@ -16,8 +16,8 @@ func (Discount) TableName() string {
 func ToModelDiscount(domainDiscount domain.Discount) Discount {
 	return Discount{
 		ID:         domainDiscount.ID,
-		SKU:        domainDiscount.SKU,
-		Category:   domainDiscount.Category,
+		Type:       domainDiscount.Type,
+		Identifier: domainDiscount.Identifier,
 		Percentage: domainDiscount.Percentage,
 	}
 }
@@ -25,8 +25,8 @@ func ToModelDiscount(domainDiscount domain.Discount) Discount {
 func ToDomainDiscount(modelDiscount Discount) domain.Discount {
 	return domain.Discount{
 		ID:         modelDiscount.ID,
-		SKU:        modelDiscount.SKU,
-		Category:   modelDiscount.Category,
+		Type:       modelDiscount.Type,
+		Identifier: modelDiscount.Identifier,
 		Percentage: modelDiscount.Percentage,
 	}
 }

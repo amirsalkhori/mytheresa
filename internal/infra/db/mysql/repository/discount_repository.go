@@ -27,12 +27,12 @@ func (r DiscountRepository) CreateDiscount(ctx context.Context, disocunt domain.
 	return model.ToDomainDiscount(modelDiscount), nil
 }
 
-func (r DiscountRepository) GetDiscountsBySKUAndCategory(ctx context.Context, sku, category string) (domain.Discount, error) {
+func (r DiscountRepository) GetDiscountsBySKUAndCategory(ctx context.Context, identifier string) (domain.Discount, error) {
 	var modelDiscount model.Discount
 
 	// Correct SQL query with explicit field selection
 	err := r.DB.Table("discounts").
-		Where("discounts.sku = ? OR discounts.category = ?", sku, category).
+		Where("discounts.identifier = ? ", identifier).
 		Order("discounts.percentage DESC").
 		Limit(1).
 		Scan(&modelDiscount).Error
