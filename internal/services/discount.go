@@ -49,7 +49,7 @@ func (s *DiscountService) GetDiscount(ctx context.Context, sku, category string)
 
 	discount, dbErr := s.repo.GetDiscountsBySKUAndCategory(ctx, sku, category)
 	if dbErr != nil {
-		return domain.Discount{}, errors.New("unable to fetch discount from Redis and database")
+		return domain.Discount{}, errors.New("unable to fetch discount from database")
 	}
 
 	if discount.ID == 0 {

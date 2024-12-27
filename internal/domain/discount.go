@@ -4,5 +4,5 @@ type Discount struct {
 	ID         uint32
 	Category   string
 	SKU        string
-	Percentage string
+	Percentage uint8
 }

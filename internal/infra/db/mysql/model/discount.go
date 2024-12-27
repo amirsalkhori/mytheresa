@@ -6,7 +6,7 @@ type Discount struct {
 	ID         uint32 `gorm:"primaryKey;autoIncrement"`
 	SKU        string `gorm:"index;type:varchar(255);not null"`
 	Category   string `gorm:"index;type:varchar(255);not null"`
-	Percentage string `gorm:"index;type:varchar(10);not null"`
+	Percentage uint8  `gorm:"not null"`
 }
 
 func (Discount) TableName() string {

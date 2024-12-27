@@ -17,7 +17,7 @@ CREATE TABLE discounts
     id          INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     sku         VARCHAR(255) NOT NULL,
     category    VARCHAR(255) NOT NULL,
-    percentage  VARCHAR(10) NOT NULL,
+    percentage  TINYINT UNSIGNED  NOT NULL,
     INDEX idx_sku (sku),            
     INDEX idx_category (category), 
     INDEX idx_percentage (percentage)     

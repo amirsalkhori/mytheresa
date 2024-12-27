@@ -2,11 +2,8 @@ package services
 
 import (
 	"context"
-	"fmt"
 	"mytheresa/internal/domain"
 	"mytheresa/internal/ports"
-	"strconv"
-	"strings"
 )
 
 type ProductService struct {
@@ -31,22 +28,15 @@ func (s ProductService) ListProducts(ctx context.Context, filters map[string]int
 
 	for _, product := range products {
 		var finalPrice = product.Price
-		var discountPercentage *string
+		var discountPercentage *uint8
 
 		discount, err := s.DiscountService.GetDiscount(ctx, product.SKU, product.Category)
 		if err != nil || discount.ID == 0 {
 			discountPercentage = nil
 		} else {
 			discountPercentage = &discount.Percentage
-			// Convert the discount percentage string to an integer and apply the discount
-			percentage, err := parseDiscountPercentage(*discountPercentage)
-			if err != nil {
-				return nil, domain.Pagination{}, fmt.Errorf("invalid discount percentage: %v", err)
-			}
-			// Apply the discount to the price
-			finalPrice = applyDiscount(finalPrice, percentage)
+			finalPrice = applyDiscount(finalPrice, discount.Percentage)
 		}
-
 		discountedProduct := domain.ProductDiscount{
 			SKU:      product.SKU,
 			Name:     product.Name,
@@ -64,24 +54,7 @@ func (s ProductService) ListProducts(ctx context.Context, filters map[string]int
 	return discountedProducts, pagination, nil
 }
 
-func applyDiscount(originalPrice uint32, discountPercentage int) uint32 {
+func applyDiscount(originalPrice uint32, discountPercentage uint8) uint32 {
 	discountAmount := (originalPrice * uint32(discountPercentage)) / 100
 	return originalPrice - discountAmount
-}
-
-func parseDiscountPercentage(discount string) (int, error) {
-	// Trim any whitespace and remove the "%" symbol
-	discount = strings.TrimSpace(discount)
-	if len(discount) == 0 || discount[len(discount)-1] != '%' {
-		return 0, fmt.Errorf("invalid discount format: missing '%' symbol")
-	}
-
-	// Remove the "%" and convert the remaining part to an integer
-	percentageStr := discount[:len(discount)-1]
-	percentage, err := strconv.Atoi(percentageStr)
-	if err != nil {
-		return 0, fmt.Errorf("invalid discount value: %v", err)
-	}
-
-	return percentage, nil
 }

@@ -3,6 +3,6 @@ package domain
 type Price struct {
 	Original           uint32
 	Final              uint32
-	DiscountPercentage *string
+	DiscountPercentage *uint8
 	Currency           string
 }
