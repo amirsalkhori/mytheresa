@@ -45,15 +45,15 @@ func StartApplication() {
 		log.Fatalf("Error checking initialization status: %v", err)
 	}
 	if initialized == "" {
-		productfilePath := "../resources/product.json"
-		discountfilePath := "../resources/discount.json"
+		productFilePath := "./resources/product.json"
+		discountFilePath := "./resources/discount.json"
 
 		// Load products, discounts from JSON
-		productsRoot, err := loadProductsFromJSON(ctx, productfilePath)
+		productsRoot, err := loadProductsFromJSON(ctx, productFilePath)
 		if err != nil {
 			log.Fatalf("Error loading products from JSON: %v", err)
 		}
-		discountsRoot, err := loadDiscountsFromJSON(ctx, discountfilePath)
+		discountsRoot, err := loadDiscountsFromJSON(ctx, discountFilePath)
 		if err != nil {
 			log.Fatalf("Error loading discounts from JSON: %v", err)
 		}
