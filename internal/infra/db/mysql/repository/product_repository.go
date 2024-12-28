@@ -28,37 +28,44 @@ func (r ProductRepository) CreateProduct(ctx context.Context, product domain.Pro
 	return model.ToDomainProduct(modelProduct), nil
 }
 
-func (r ProductRepository) ListProducts(ctx context.Context, filters map[string]interface{}, pageSize, page int) ([]domain.Product, domain.Pagination, error) {
-	var modelProducts []model.Product
+func (r *ProductRepository) ListProducts(ctx context.Context, filters map[string]interface{}, pageSize int, lastID uint32) ([]domain.Product, domain.Pagination, error) {
+	var modelProducts []model.Product // Assuming ProductModel is the GORM model
 	var totalCount int64
 	query := r.DB.Model(&model.Product{})
 
 	if category, ok := filters["category"]; ok {
-		query = query.Where("products.category = ?", category)
+		query.Where("category = ?", category)
 	}
-
 	if price, ok := filters["priceLessThan"]; ok {
-		query = query.Where("products.price <= ?", price)
+		query.Where("price <= ?", price)
 	}
+	if lastID > 0 {
+		query.Where("id > ?", lastID)
+	}
+
 	if err := query.Count(&totalCount).Error; err != nil {
-		log.Fatal("Error while counting the rows", err)
+		log.Printf("Error while counting rows: %v", err)
 		return nil, domain.Pagination{}, err
 	}
 
-	offset := (page - 1) * pageSize
-	query = query.Limit(pageSize).Offset(offset)
-
-	err := query.Find(&modelProducts).Error
-	if err != nil {
-		log.Fatal("Failed to get data from products by filter", err)
+	query = query.Order("id ASC").Limit(pageSize)
+	var products []domain.Product
+	if err := query.Find(&modelProducts).Error; err != nil {
+		log.Printf("Failed to get products: %v", err)
 		return nil, domain.Pagination{}, err
 	}
 
+	products = model.ToDomainProducts(modelProducts)
+
+	var nextID uint32
+	if len(products) > 0 {
+		nextID = products[len(products)-1].ID
+	}
 	pagination := domain.Pagination{
-		Page:     int32(page),
-		PageSize: int32(pageSize),
-		Total:    int32(totalCount),
+		PageSize: uint32(pageSize),
+		Total:    uint32(totalCount),
+		Page:     nextID,
 	}
 
-	return model.ToDomainProducts(modelProducts), pagination, nil
+	return products, pagination, nil
 }

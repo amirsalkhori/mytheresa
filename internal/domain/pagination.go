@@ -1,7 +1,7 @@
 package domain
 
 type Pagination struct {
-	Page     int32
-	PageSize int32
-	Total    int32
+	Page     uint32
+	PageSize uint32
+	Total    uint32
 }

@@ -20,8 +20,8 @@ func (s *ProductService) CreateProduct(ctx context.Context, product domain.Produ
 	return s.Repo.CreateProduct(ctx, product)
 }
 
-func (s ProductService) ListProducts(ctx context.Context, filters map[string]interface{}, pageSize, page int) ([]domain.ProductDiscount, domain.Pagination, error) {
-	products, pagination, err := s.Repo.ListProducts(ctx, filters, pageSize, page)
+func (s ProductService) ListProducts(ctx context.Context, filters map[string]interface{}, pageSize int, lastID uint32) ([]domain.ProductDiscount, domain.Pagination, error) {
+	products, pagination, err := s.Repo.ListProducts(ctx, filters, pageSize, lastID)
 	if err != nil {
 		return nil, domain.Pagination{}, err
 	}
@@ -40,6 +40,7 @@ func (s ProductService) ListProducts(ctx context.Context, filters map[string]int
 			finalPrice = applyDiscount(finalPrice, discount.Percentage)
 		}
 		discountedProduct := domain.ProductDiscount{
+			ID:       product.ID,
 			SKU:      product.SKU,
 			Name:     product.Name,
 			Category: product.Category,

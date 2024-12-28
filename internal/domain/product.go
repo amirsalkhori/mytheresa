@@ -10,6 +10,7 @@ type Product struct {
 }
 
 type ProductDiscount struct {
+	ID       uint32
 	SKU      string
 	Name     string
 	Category string
