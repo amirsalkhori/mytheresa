@@ -21,3 +21,16 @@ CREATE TABLE discounts
     INDEX idx_identifier (identifier), 
     INDEX idx_percentage (percentage)     
 );
+
+-- Inserting products
+INSERT INTO products (sku, name, category, price) VALUES
+('000001', 'BV Lean leather ankle boots', 'boots', 89000),
+('000002', 'BV Lean leather ankle boots', 'boots', 99000),
+('000003', 'Ashlington leather ankle boots', 'boots', 71000),
+('000004', 'Naima embellished suede sandals', 'sandals', 79500),
+('000005', 'Nathane leather sneakers', 'sneakers', 59000);
+
+-- Inserting discounts
+INSERT INTO discounts (type, identifier, percentage) VALUES
+('sku', '000003', 15),
+('category', 'boots', 30);
