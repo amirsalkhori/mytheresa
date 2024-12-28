@@ -10,6 +10,10 @@ import (
 	"mytheresa/internal/ports"
 )
 
+const (
+	Expiration = 12 * 60 * 60
+)
+
 type DiscountService struct {
 	repo  ports.DisocuntRepository
 	redis ports.Cache
@@ -25,7 +29,7 @@ func (s *DiscountService) CreateDiscount(ctx context.Context, discount domain.Di
 		return domain.Discount{}, err
 	}
 
-	discountKey := s.generateRedisKey(createdDiscount.Identifier)
+	discountKey := s.generateRedisKey(createdDiscount.Type, createdDiscount.Identifier)
 
 	discountValue, _ := json.Marshal(createdDiscount)
 
@@ -38,7 +42,7 @@ func (s *DiscountService) CreateDiscount(ctx context.Context, discount domain.Di
 }
 
 func (s *DiscountService) GetDiscount(ctx context.Context, identifier string) (domain.Discount, error) {
-	discountKey := s.generateRedisKey(identifier)
+	discountKey := s.generateRedisKey(identifier, "")
 	discountData, err := s.redis.Get(ctx, discountKey)
 	if err == nil {
 		var discount domain.Discount
@@ -63,11 +67,17 @@ func (s *DiscountService) GetDiscount(ctx context.Context, identifier string) (d
 }
 
 func (s *DiscountService) GetBestDiscount(ctx context.Context, product domain.Product) (domain.Discount, error) {
-	productAttributes := []string{product.SKU, product.Category}
-	discounts := make([]domain.Discount, 0, len(productAttributes))
+	attributes := []struct {
+		key, value string
+	}{
+		{"sku", product.SKU},
+		{"category", product.Category},
+	}
 
-	for _, attribute := range productAttributes {
-		discount, err := s.getDiscountByAttribute(ctx, attribute)
+	discounts := make([]domain.Discount, 0, len(attributes))
+
+	for _, attribute := range attributes {
+		discount, err := s.getDiscountByAttribute(ctx, attribute.key, attribute.value)
 		if err != nil {
 			log.Printf("Error fetching discount for attribute %s: %v", attribute, err)
 			continue
@@ -78,11 +88,15 @@ func (s *DiscountService) GetBestDiscount(ctx context.Context, product domain.Pr
 		}
 	}
 
+	if len(discounts) == 0 {
+		return domain.Discount{}, nil
+	}
+
 	return s.getHighestDiscount(discounts), nil
 }
 
-func (s *DiscountService) getDiscountByAttribute(ctx context.Context, attribute string) (domain.Discount, error) {
-	redisKey := s.generateRedisKey(attribute)
+func (s *DiscountService) getDiscountByAttribute(ctx context.Context, key, attribute string) (domain.Discount, error) {
+	redisKey := s.generateRedisKey(key, attribute)
 	discountData, err := s.redis.Get(ctx, redisKey)
 	if err == nil {
 		var discount domain.Discount
@@ -91,18 +105,8 @@ func (s *DiscountService) getDiscountByAttribute(ctx context.Context, attribute 
 		}
 		log.Printf("Failed to unmarshal discount data for key %s: %v", redisKey, err)
 	}
-	discount, dbErr := s.repo.GetDiscountsBySKUAndCategory(ctx, attribute)
-	if dbErr != nil {
-		return domain.Discount{}, fmt.Errorf("failed to fetch discount from database for attribute %s: %w", attribute, dbErr)
-	}
-	if discount.ID != 0 {
-		discountValue, _ := json.Marshal(discount)
-		if setErr := s.redis.Set(ctx, redisKey, discountValue, 0); setErr != nil {
-			log.Printf("Failed to cache discount data for key %s: %v", redisKey, setErr)
-		}
-	}
 
-	return discount, nil
+	return domain.Discount{}, nil
 }
 
 func (s *DiscountService) getHighestDiscount(discounts []domain.Discount) domain.Discount {
@@ -115,6 +119,6 @@ func (s *DiscountService) getHighestDiscount(discounts []domain.Discount) domain
 	return bestDiscount
 }
 
-func (s *DiscountService) generateRedisKey(identifier string) string {
-	return "discount:type:" + identifier
+func (s *DiscountService) generateRedisKey(discountType, identifier string) string {
+	return fmt.Sprintf("discount_%s_%s", discountType, identifier)
 }
