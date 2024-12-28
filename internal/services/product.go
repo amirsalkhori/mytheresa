@@ -31,7 +31,7 @@ func (s ProductService) ListProducts(ctx context.Context, filters map[string]int
 		var finalPrice = product.Price
 		var discountPercentage *string
 
-		discount, err := s.DiscountService.GetBestDiscount(ctx, product)
+		discount, err := s.DiscountService.GetBestDiscount(ctx, product.SKU, product.Category)
 		if err != nil || discount.ID == 0 {
 			discountPercentage = nil
 		} else {

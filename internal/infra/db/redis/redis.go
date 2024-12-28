@@ -37,7 +37,3 @@ func (r *RedisAdapter) Set(ctx context.Context, key string, value interface{}, e
 func (r *RedisAdapter) Get(ctx context.Context, key string) (string, error) {
 	return r.client.Get(ctx, key).Result()
 }
-
-func (r *RedisAdapter) Delete(ctx context.Context, key string) error {
-	return r.client.Del(ctx, key).Err()
-}

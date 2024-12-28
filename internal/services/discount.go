@@ -9,21 +9,17 @@ import (
 	"mytheresa/internal/ports"
 )
 
-const (
-	Expiration = 12 * 60 * 60
-)
-
 type DiscountService struct {
-	repo  ports.DisocuntRepository
-	redis ports.Cache
+	Repo  ports.DisocuntRepository
+	Redis ports.Cache
 }
 
 func NewDiscountService(repo ports.DisocuntRepository, redis ports.Cache) ports.DiscountService {
-	return &DiscountService{repo: repo, redis: redis}
+	return &DiscountService{Repo: repo, Redis: redis}
 }
 
 func (s *DiscountService) CreateDiscount(ctx context.Context, discount domain.Discount) (domain.Discount, error) {
-	createdDiscount, err := s.repo.CreateDiscount(ctx, discount)
+	createdDiscount, err := s.Repo.CreateDiscount(ctx, discount)
 	if err != nil {
 		return domain.Discount{}, err
 	}
@@ -32,7 +28,7 @@ func (s *DiscountService) CreateDiscount(ctx context.Context, discount domain.Di
 
 	discountValue, _ := json.Marshal(createdDiscount)
 
-	err = s.redis.Set(ctx, discountKey, discountValue, 0)
+	err = s.Redis.Set(ctx, discountKey, discountValue, 0)
 	if err != nil {
 		log.Fatal("error during the discount persist into the Redis!")
 	}
@@ -40,12 +36,12 @@ func (s *DiscountService) CreateDiscount(ctx context.Context, discount domain.Di
 	return createdDiscount, nil
 }
 
-func (s *DiscountService) GetBestDiscount(ctx context.Context, product domain.Product) (domain.Discount, error) {
+func (s *DiscountService) GetBestDiscount(ctx context.Context, sku, category string) (domain.Discount, error) {
 	attributes := []struct {
 		key, value string
 	}{
-		{"sku", product.SKU},
-		{"category", product.Category},
+		{"sku", sku},
+		{"category", category},
 	}
 
 	discounts := make([]domain.Discount, 0, len(attributes))
@@ -71,7 +67,7 @@ func (s *DiscountService) GetBestDiscount(ctx context.Context, product domain.Pr
 
 func (s *DiscountService) getDiscountByAttribute(ctx context.Context, key, attribute string) (domain.Discount, error) {
 	redisKey := s.generateRedisKey(key, attribute)
-	discountData, err := s.redis.Get(ctx, redisKey)
+	discountData, err := s.Redis.Get(ctx, redisKey)
 	if err == nil {
 		var discount domain.Discount
 		if jsonErr := json.Unmarshal([]byte(discountData), &discount); jsonErr == nil {
