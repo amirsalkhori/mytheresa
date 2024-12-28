@@ -29,8 +29,7 @@ func (r ProductRepository) CreateProduct(ctx context.Context, product domain.Pro
 }
 
 func (r *ProductRepository) ListProducts(ctx context.Context, filters map[string]interface{}, pageSize int, lastID uint32) ([]domain.Product, domain.Pagination, error) {
-	var modelProducts []model.Product // Assuming ProductModel is the GORM model
-	var totalCount int64
+	var modelProducts []model.Product
 	query := r.DB.Model(&model.Product{})
 
 	if category, ok := filters["category"]; ok {
@@ -41,11 +40,6 @@ func (r *ProductRepository) ListProducts(ctx context.Context, filters map[string
 	}
 	if lastID > 0 {
 		query.Where("id > ?", lastID)
-	}
-
-	if err := query.Count(&totalCount).Error; err != nil {
-		log.Printf("Error while counting rows: %v", err)
-		return nil, domain.Pagination{}, err
 	}
 
 	query = query.Order("id ASC").Limit(pageSize)
@@ -63,7 +57,6 @@ func (r *ProductRepository) ListProducts(ctx context.Context, filters map[string
 	}
 	pagination := domain.Pagination{
 		PageSize: uint32(pageSize),
-		Total:    uint32(totalCount),
 		Page:     nextID,
 	}
 
