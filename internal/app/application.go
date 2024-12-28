@@ -33,11 +33,8 @@ func StartApplication() {
 
 	r := gin.Default()
 	productHandler := handler.NewProductHandler(productService)
-	discountHandler := handler.NewDiscountHandler(disocuntService)
 
-	r.POST("/products", productHandler.CreateProduct)
 	r.GET("/products", productHandler.GetFilteredProducts)
-	r.POST("/discounts", discountHandler.CreateDiscount)
 
 	if err := r.Run(":8080"); err != nil {
 		log.Fatalf("failed to start server: %v", err)
