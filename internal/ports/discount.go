@@ -14,11 +14,9 @@ type DisocuntRepository interface {
 
 type DiscountService interface {
 	CreateDiscount(ctx context.Context, discount domain.Discount) (domain.Discount, error)
-	GetDiscount(ctx context.Context, identifier string) (domain.Discount, error)
 	GetBestDiscount(ctx context.Context, product domain.Product) (domain.Discount, error)
 }
 
 type DiscountHandler interface {
 	CreateDiscount(c *gin.Context)
-	GetDiscount(c *gin.Context)
 }

@@ -3,7 +3,6 @@ package services
 import (
 	"context"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"log"
 	"mytheresa/internal/domain"
@@ -39,31 +38,6 @@ func (s *DiscountService) CreateDiscount(ctx context.Context, discount domain.Di
 	}
 
 	return createdDiscount, nil
-}
-
-func (s *DiscountService) GetDiscount(ctx context.Context, identifier string) (domain.Discount, error) {
-	discountKey := s.generateRedisKey(identifier, "")
-	discountData, err := s.redis.Get(ctx, discountKey)
-	if err == nil {
-		var discount domain.Discount
-		if err := json.Unmarshal([]byte(discountData), &discount); err == nil {
-			return discount, nil
-		}
-		log.Fatal("Log unmarshalling error but proceed to fallback")
-	}
-
-	discount, dbErr := s.repo.GetDiscountsBySKUAndCategory(ctx, identifier)
-	if dbErr != nil {
-		return domain.Discount{}, errors.New("unable to fetch discount from database")
-	}
-
-	if discount.ID == 0 {
-		return domain.Discount{}, nil
-	}
-	discountValue, _ := json.Marshal(discount)
-	_ = s.redis.Set(ctx, discountKey, discountValue, 0)
-
-	return discount, nil
 }
 
 func (s *DiscountService) GetBestDiscount(ctx context.Context, product domain.Product) (domain.Discount, error) {
