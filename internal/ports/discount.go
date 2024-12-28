@@ -9,11 +9,13 @@ import (
 
 type DisocuntRepository interface {
 	CreateDiscount(ctx context.Context, disocunt domain.Discount) (domain.Discount, error)
+	GetAllDiscounts() ([]domain.Discount, error)
 }
 
 type DiscountService interface {
 	CreateDiscount(ctx context.Context, discount domain.Discount) (domain.Discount, error)
 	GetBestDiscount(ctx context.Context, sku, category string) (domain.Discount, error)
+	StoreDiscountsInRedis(ctx context.Context) error
 }
 
 type DiscountHandler interface {

@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"log"
 	"mytheresa/internal/domain"
 	"mytheresa/internal/infra/db/mysql/model"
 	"mytheresa/internal/ports"
@@ -43,4 +44,14 @@ func (r DiscountRepository) GetDiscountsBySKUAndCategory(ctx context.Context, id
 		return domain.Discount{}, err
 	}
 	return model.ToDomainDiscount(modelDiscount), nil
+}
+
+func (r DiscountRepository) GetAllDiscounts() ([]domain.Discount, error) {
+	var modelDiscounts []model.Discount
+	query := r.DB.Model(&model.Discount{})
+	if err := query.Find(&modelDiscounts).Error; err != nil {
+		log.Printf("Failed to get discounts: %v", err)
+		return nil, err
+	}
+	return model.ToDomainDiscounts(modelDiscounts), nil
 }

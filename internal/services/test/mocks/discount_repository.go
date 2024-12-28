@@ -17,6 +17,11 @@ func (m *MockDiscountRepository) CreateDiscount(ctx context.Context, discount do
 	return args.Get(0).(domain.Discount), args.Error(1)
 }
 
+func (m *MockDiscountRepository) GetAllDiscounts() ([]domain.Discount, error) {
+	args := m.Called()
+	return args.Get(0).([]domain.Discount), args.Error(1)
+}
+
 type MockCache struct {
 	mock.Mock
 }

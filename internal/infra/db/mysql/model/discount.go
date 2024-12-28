@@ -30,3 +30,15 @@ func ToDomainDiscount(modelDiscount Discount) domain.Discount {
 		Percentage: modelDiscount.Percentage,
 	}
 }
+
+func ToDomainDiscounts(modelDiscounts []Discount) []domain.Discount {
+	if len(modelDiscounts) == 0 {
+		return nil
+	}
+	discounts := make([]domain.Discount, 0, len(modelDiscounts))
+	for _, discount := range modelDiscounts {
+		discounts = append(discounts, ToDomainDiscount(discount))
+	}
+
+	return discounts
+}

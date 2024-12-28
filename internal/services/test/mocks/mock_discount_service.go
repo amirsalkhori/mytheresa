@@ -20,3 +20,8 @@ func (m *MockDiscountService) CreateDiscount(ctx context.Context, discount domai
 	args := m.Called(ctx, discount)
 	return args.Get(0).(domain.Discount), args.Error(1)
 }
+
+func (m *MockDiscountService) StoreDiscountsInRedis(ctx context.Context) error {
+	args := m.Called(ctx)
+	return args.Error(0)
+}

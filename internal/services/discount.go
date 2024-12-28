@@ -36,6 +36,30 @@ func (s *DiscountService) CreateDiscount(ctx context.Context, discount domain.Di
 	return createdDiscount, nil
 }
 
+func (s *DiscountService) StoreDiscountsInRedis(ctx context.Context) error {
+	discounts, err := s.Repo.GetAllDiscounts()
+	if err != nil {
+		return err
+	}
+
+	for _, discount := range discounts {
+		discountKey := s.generateRedisKey(discount.Type, discount.Identifier)
+
+		discountData, err := json.Marshal(discount)
+		if err != nil {
+			log.Printf("Error marshalling discount: %v", err)
+			continue
+		}
+		err = s.Redis.Set(ctx, discountKey, discountData, 0)
+		if err != nil {
+			log.Fatal("error during the discount persist into the Redis!")
+		}
+	}
+
+	log.Println("Discounts have been successfully stored in Redis.")
+	return nil
+}
+
 func (s *DiscountService) GetBestDiscount(ctx context.Context, sku, category string) (domain.Discount, error) {
 	attributes := []struct {
 		key, value string
