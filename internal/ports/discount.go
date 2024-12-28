@@ -2,6 +2,7 @@ package ports
 
 import (
 	"context"
+	"mytheresa/internal/app/dto"
 	"mytheresa/internal/domain"
 
 	"github.com/gin-gonic/gin"
@@ -20,4 +21,5 @@ type DiscountService interface {
 
 type DiscountHandler interface {
 	CreateDiscount(c *gin.Context)
+	CreateDiscountFromFile(ctx context.Context, discountsRoot dto.DisocuntRoot)
 }

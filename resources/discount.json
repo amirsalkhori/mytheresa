@@ -1,0 +1,14 @@
+{
+	"disocunts": [
+		{
+			"type": "sku",
+			"identifier": "000003",
+			"percentage": 15
+		},
+		{
+			"type": "category",
+			"identifier": "boots",
+			"percentage": 30
+		}
+	]
+}

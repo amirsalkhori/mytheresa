@@ -69,7 +69,7 @@ func runMigrations(cfg *configs.Mysql) error {
 
 	// Create a new migration instance
 	m, err := migrate.NewWithDatabaseInstance(
-		"file://./migrations",
+		"file://../migrations",
 		"mysql", driver)
 	if err != nil {
 		return fmt.Errorf("failed to create migration instance: %w", err)

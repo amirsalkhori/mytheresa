@@ -1,6 +1,10 @@
 package handler
 
 import (
+	"context"
+	"fmt"
+	"log"
+	"mytheresa/internal/app/dto"
 	"mytheresa/internal/domain"
 	"mytheresa/internal/ports"
 
@@ -31,4 +35,19 @@ func (h *DiscountHandler) CreateDiscount(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusCreated, createdDiscount)
+}
+
+func (h *DiscountHandler) CreateDiscountFromFile(ctx context.Context, discountsRoot dto.DisocuntRoot) {
+	for _, discount := range discountsRoot.Disocunts {
+		discountDomain := domain.Discount{
+			Type:       discount.Type,
+			Identifier: discount.Identifier,
+			Percentage: discount.Percentage,
+		}
+		_, err := h.service.CreateDiscount(ctx, discountDomain)
+		if err != nil {
+			fmt.Println("Could not create discount")
+		}
+	}
+	log.Println("Discounts have been successfully stored in DB.")
 }

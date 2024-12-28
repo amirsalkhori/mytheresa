@@ -1,7 +1,10 @@
 package handler
 
 import (
+	"context"
 	"fmt"
+	"log"
+	"mytheresa/internal/app/dto"
 	"mytheresa/internal/domain"
 	"mytheresa/internal/ports"
 	"strconv"
@@ -19,20 +22,20 @@ func NewProductHandler(service ports.ProductService) *ProductHandler {
 	return &ProductHandler{Service: service}
 }
 
-func (h *ProductHandler) CreateProduct(c *gin.Context) {
-	var product domain.Product
-	if err := c.ShouldBindJSON(&product); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request"})
-		return
+func (h *ProductHandler) CreateProducts(ctx context.Context, productsRoot dto.ProductsRoot) {
+	for _, product := range productsRoot.Products {
+		productDomain := domain.Product{
+			SKU:      product.SKU,
+			Name:     product.Name,
+			Category: product.Category,
+			Price:    uint32(product.Price),
+		}
+		_, err := h.Service.CreateProduct(ctx, productDomain)
+		if err != nil {
+			fmt.Println("Could not create product")
+		}
 	}
-
-	createdProduct, err := h.Service.CreateProduct(c.Request.Context(), product)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Could not create product"})
-		return
-	}
-
-	c.JSON(http.StatusCreated, createdProduct)
+	log.Println("Products have been successfully stored DB.")
 }
 
 func (h *ProductHandler) GetFilteredProducts(c *gin.Context) {
