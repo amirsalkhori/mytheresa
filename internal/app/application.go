@@ -14,6 +14,7 @@ import (
 
 func StartApplication() {
 	cfg := configs.GetConfig()
+	hashIDSalt := cfg.HashIDSalt
 	db, err := mysql.NewMySQLRepository(&cfg)
 	if err != nil {
 		log.Fatal("MySQL error:", err)
@@ -28,9 +29,9 @@ func StartApplication() {
 	discountRepo := repository.NewDiscountRepository(db.DB)
 
 	discountService := services.NewDiscountService(discountRepo, redis)
-	productService := services.NewProductService(productRepo, discountService)
+	productService := services.NewProductService(productRepo, discountService, hashIDSalt)
 
-	productHandler := handler.NewProductHandler(productService)
+	productHandler := handler.NewProductHandler(productService, hashIDSalt)
 
 	r := gin.Default()
 	r.GET("/products", productHandler.GetFilteredProducts)

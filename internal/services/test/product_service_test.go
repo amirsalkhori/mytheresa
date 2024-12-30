@@ -26,7 +26,7 @@ var _ = ginkgo.Describe("ProductService", func() {
 	ginkgo.BeforeEach(func() {
 		mockRepo = new(mocks.MockProductRepository)
 		mockDiscountService = new(mocks.MockDiscountService)
-		productService = services.NewProductService(mockRepo, mockDiscountService)
+		productService = services.NewProductService(mockRepo, mockDiscountService, "mytheresa-salt-value")
 		ctx = context.Background()
 		mockProduct = domain.Product{
 			ID:       1,
@@ -98,7 +98,7 @@ var _ = ginkgo.Describe("ProductService", func() {
 				},
 			}
 			mockRepo.On("ListProducts", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
-				Return([]domain.Product{mockProduct, mockProduct2}, domain.Pagination{Next: 1, Prev: 3, PageSize: 2}, nil).
+				Return([]domain.Product{mockProduct, mockProduct2}, domain.HashedPagination{Next: "Ra2dkD", Prev: "Vbgobn", PageSize: 2}, nil).
 				Once()
 
 			mockDiscountService.On("GetBestDiscount", mock.Anything, "000001", "boots").

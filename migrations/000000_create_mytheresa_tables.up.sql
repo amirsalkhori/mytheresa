@@ -1,7 +1,7 @@
 CREATE TABLE products
 (
     id          INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    sku         VARCHAR(255) NOT NULL,
+    sku         VARCHAR(255) NOT NULL UNIQUE,
     name        VARCHAR(255) NOT NULL,
     category    VARCHAR(255) NOT NULL,
     price       INT UNSIGNED NOT NULL,

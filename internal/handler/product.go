@@ -10,16 +10,22 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
+	"github.com/speps/go-hashids"
 
 	"net/http"
 )
 
 type ProductHandler struct {
 	Service ports.ProductService
+	hashids *hashids.HashID
 }
 
-func NewProductHandler(service ports.ProductService) *ProductHandler {
-	return &ProductHandler{Service: service}
+func NewProductHandler(service ports.ProductService, salt string) *ProductHandler {
+	hd := hashids.NewData()
+	hd.Salt = salt
+	hd.MinLength = 6
+	hashid, _ := hashids.NewWithData(hd)
+	return &ProductHandler{Service: service, hashids: hashid}
 }
 
 func (h *ProductHandler) CreateProducts(ctx context.Context, productsRoot dto.ProductsRoot) {
@@ -55,32 +61,27 @@ func (h *ProductHandler) GetFilteredProducts(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Pagesize can not be more than 5"})
 		return
 	}
-	nextIDStr := c.Query("next")
-	var nextIDUint32 uint32
-	if nextIDStr == "" {
-		nextIDUint32 = 0
-	} else {
-		nextID, err := strconv.ParseUint(nextIDStr, 10, 32)
-		if err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid nextID parameter"})
+	nextHash := c.Query("next")
+	prevHash := c.Query("prev")
+	var nextID, prevID uint32
+	if nextHash != "" {
+		decoded, err := h.hashids.DecodeInt64WithError(nextHash)
+		if err != nil || len(decoded) == 0 {
+			c.JSON(http.StatusBadRequest, gin.H{"einvalid next hash": err.Error()})
 			return
 		}
-		nextIDUint32 = uint32(nextID)
+		nextID = uint32(decoded[0])
 	}
 
-	prevIDStr := c.Query("prev")
-	var prevIDUint32 uint32
-	if prevIDStr == "" {
-		prevIDUint32 = 0
-	} else {
-		prevID, err := strconv.ParseUint(prevIDStr, 10, 32)
-		if err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid prevID parameter"})
+	if prevHash != "" {
+		decoded, err := h.hashids.DecodeInt64WithError(prevHash)
+		if err != nil || len(decoded) == 0 {
+			c.JSON(http.StatusBadRequest, gin.H{"invalid prev hash": err.Error()})
 			return
 		}
-		prevIDUint32 = uint32(prevID)
+		prevID = uint32(decoded[0])
 	}
-	products, pagination, err := h.Service.ListProducts(c.Request.Context(), filters, pageSize, nextIDUint32, prevIDUint32)
+	products, pagination, err := h.Service.ListProducts(c.Request.Context(), filters, pageSize, nextID, prevID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch products"})
 		return

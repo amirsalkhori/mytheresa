@@ -5,3 +5,9 @@ type Pagination struct {
 	Prev     uint32
 	PageSize uint32
 }
+
+type HashedPagination struct {
+	Next     string
+	Prev     string
+	PageSize uint32
+}

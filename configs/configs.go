@@ -8,9 +8,10 @@ import (
 )
 
 type Config struct {
-	App   App   `yaml:"app" mapstructure:"app"`
-	Mysql Mysql `yaml:"mysql" mapstructure:"mysql"`
-	Redis Redis `mapstructure:"redis"`
+	App        App    `yaml:"app" mapstructure:"app"`
+	Mysql      Mysql  `yaml:"mysql" mapstructure:"mysql"`
+	Redis      Redis  `mapstructure:"redis"`
+	HashIDSalt string `mapstructure:"hash_id_salt"`
 }
 
 type App struct {
@@ -64,6 +65,7 @@ func bindEnv(v *viper.Viper) {
 		"redis.host":     "MYTHERESA_REDIS_HOST",
 		"redis.port":     "MYTHERESA_REDIS_PORT",
 		"redis.password": "MYTHERESA_REDIS_PASSWORD",
+		"hash_id_salt":   "HASH_ID_SAlT",
 	}
 
 	for key, env := range envBindings {
