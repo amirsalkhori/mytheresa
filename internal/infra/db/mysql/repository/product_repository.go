@@ -30,11 +30,12 @@ func (r ProductRepository) CreateProduct(ctx context.Context, product domain.Pro
 
 func (r *ProductRepository) ListProducts(ctx context.Context, filters map[string]interface{}, pageSize int, next, prev uint32) ([]domain.Product, domain.Pagination, error) {
 	var modelProducts []model.Product
-	query := r.DB.Model(&model.Product{})
+	query := r.DB.Model(&model.Product{}).Preload("Category")
 
 	// Apply filters
 	if category, ok := filters["category"]; ok {
-		query.Where("category = ?", category)
+		query.Joins("JOIN categories c ON c.id = products.category_id")
+		query.Where("c.name = ?", category)
 	}
 	if price, ok := filters["priceLessThan"]; ok {
 		query.Where("price <= ?", price)
@@ -44,11 +45,9 @@ func (r *ProductRepository) ListProducts(ctx context.Context, filters map[string
 		query.Where("id > ?", next).Order("id ASC").Limit(pageSize)
 	} else if prev > 0 {
 		query.Where("id < ?", prev).Order("id DESC").Limit(pageSize)
-	} else {
-		query.Order("id ASC").Limit(pageSize)
 	}
 
-	query.Order("id DESC").Limit(pageSize)
+	query.Order("id ASC").Limit(pageSize)
 	if err := query.Find(&modelProducts).Error; err != nil {
 		log.Printf("Failed to get products: %v", err)
 		return nil, domain.Pagination{}, err

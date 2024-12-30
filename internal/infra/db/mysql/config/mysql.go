@@ -21,9 +21,9 @@ type MySQLRepository struct {
 
 func NewMySQLRepository(cfg *configs.Config) (*MySQLRepository, error) {
 	// Run migrations
-	// if err := runMigrations(&cfg.Mysql); err != nil {
-	// 	return nil, err
-	// }
+	if err := runMigrations(&cfg.Mysql); err != nil {
+		return nil, err
+	}
 
 	dsn := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8&parseTime=True&loc=Local",
 		cfg.Mysql.User,
@@ -69,7 +69,7 @@ func runMigrations(cfg *configs.Mysql) error {
 
 	// Create a new migration instance
 	m, err := migrate.NewWithDatabaseInstance(
-		"file://./migrations",
+		"file://../migrations",
 		"mysql", driver)
 	if err != nil {
 		return fmt.Errorf("failed to create migration instance: %w", err)

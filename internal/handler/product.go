@@ -31,10 +31,10 @@ func NewProductHandler(service ports.ProductService, salt string) *ProductHandle
 func (h *ProductHandler) CreateProducts(ctx context.Context, productsRoot dto.ProductsRoot) {
 	for _, product := range productsRoot.Products {
 		productDomain := domain.Product{
-			SKU:      product.SKU,
-			Name:     product.Name,
-			Category: product.Category,
-			Price:    uint32(product.Price),
+			SKU:  product.SKU,
+			Name: product.Name,
+			// Category: product.Category,
+			Price: uint32(product.Price),
 		}
 		_, err := h.Service.CreateProduct(ctx, productDomain)
 		if err != nil {

@@ -5,11 +5,12 @@ import "mytheresa/internal/domain"
 var Currency = "EUR"
 
 type Product struct {
-	ID       uint32 `gorm:"primaryKey;autoIncrement"`
-	SKU      string `gorm:"index;type:varchar(255);not null"`
-	Name     string `gorm:"index;type:varchar(255);not null"`
-	Category string `gorm:"index;type:varchar(255);not null"`
-	Price    uint32 `gorm:"index;not null"`
+	ID         uint32 `gorm:"primaryKey;autoIncrement"`
+	SKU        string `gorm:"index;type:varchar(255);not null"`
+	Name       string `gorm:"index;type:varchar(255);not null"`
+	Price      uint32 `gorm:"index;not null"`
+	CategoryID uint32 `gorm:"not null"`
+	Category   Category
 }
 
 func (Product) TableName() string {
@@ -18,22 +19,24 @@ func (Product) TableName() string {
 
 func ToModelProduct(domainProduct domain.Product) Product {
 	return Product{
-		ID:       domainProduct.ID,
-		SKU:      domainProduct.SKU,
-		Name:     domainProduct.Name,
-		Category: domainProduct.Category,
-		Price:    domainProduct.Price,
+		ID:         domainProduct.ID,
+		SKU:        domainProduct.SKU,
+		Name:       domainProduct.Name,
+		Category:   ToModelCategory(domainProduct.Category),
+		CategoryID: domainProduct.CategoryID,
+		Price:      domainProduct.Price,
 	}
 }
 
 func ToDomainProduct(modelProduct Product) domain.Product {
 	return domain.Product{
-		ID:       modelProduct.ID,
-		SKU:      modelProduct.SKU,
-		Name:     modelProduct.Name,
-		Category: modelProduct.Category,
-		Currency: Currency,
-		Price:    modelProduct.Price,
+		ID:         modelProduct.ID,
+		SKU:        modelProduct.SKU,
+		Name:       modelProduct.Name,
+		Category:   ToDomainCategory(modelProduct.Category),
+		Currency:   Currency,
+		Price:      modelProduct.Price,
+		CategoryID: modelProduct.CategoryID,
 	}
 }
 

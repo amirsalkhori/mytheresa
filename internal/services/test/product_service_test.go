@@ -29,18 +29,18 @@ var _ = ginkgo.Describe("ProductService", func() {
 		productService = services.NewProductService(mockRepo, mockDiscountService, "mytheresa-salt-value")
 		ctx = context.Background()
 		mockProduct = domain.Product{
-			ID:       1,
-			SKU:      "000001",
-			Name:     "BV Lean leather ankle boots",
-			Category: "boots",
+			ID:   1,
+			SKU:  "000001",
+			Name: "BV Lean leather ankle boots",
+			// Category: "boots",
 			Price:    89000,
 			Currency: "EUR",
 		}
 		mockProduct2 = domain.Product{
-			ID:       2,
-			SKU:      "000002",
-			Name:     "Nathane leather sneakers",
-			Category: "sneakers",
+			ID:   2,
+			SKU:  "000002",
+			Name: "Nathane leather sneakers",
+			// Category: "sneakers",
 			Price:    88000,
 			Currency: "EUR",
 		}
