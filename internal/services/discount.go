@@ -92,18 +92,38 @@ func (s *DiscountService) GetBestDiscount(ctx context.Context, sku, category str
 func (s *DiscountService) getDiscountByAttribute(ctx context.Context, key, attribute string) (domain.Discount, error) {
 	redisKey := s.generateRedisKey(key, attribute)
 	discountData, err := s.Redis.Get(ctx, redisKey)
-	if err == nil {
+	if err == nil && discountData != "" {
 		var discount domain.Discount
 		if jsonErr := json.Unmarshal([]byte(discountData), &discount); jsonErr == nil {
 			return discount, nil
 		}
 		log.Printf("Failed to unmarshal discount data for key %s: %v", redisKey, err)
+	} else {
+		discount, err := s.Repo.GetDiscountsBySKUAndCategory(ctx, attribute)
+		if err != nil {
+			return domain.Discount{}, err
+		}
+		if discount.ID > 0 {
+			discountData, err := json.Marshal(discount)
+			if err != nil {
+				log.Printf("Error marshalling discount: %v", err)
+			}
+			err = s.Redis.Set(ctx, redisKey, discountData, 0)
+			if err != nil {
+				log.Fatal("error during the discount persist into the Redis!")
+			}
+			return discount, nil
+		}
+
 	}
 
 	return domain.Discount{}, nil
 }
 
 func (s *DiscountService) getHighestDiscount(discounts []domain.Discount) domain.Discount {
+	if len(discounts) == 1 {
+		return discounts[0]
+	}
 	var bestDiscount domain.Discount
 	for _, discount := range discounts {
 		if discount.Percentage > bestDiscount.Percentage {

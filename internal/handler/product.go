@@ -51,20 +51,32 @@ func (h *ProductHandler) GetFilteredProducts(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	lastIDStr := c.Query("lastID")
-	var lastIDUint32 uint32
-	if lastIDStr == "" {
-		lastIDUint32 = 0
+	nextIDStr := c.Query("next")
+	var nextIDUint32 uint32
+	if nextIDStr == "" {
+		nextIDUint32 = 0
 	} else {
-		lastID, err := strconv.ParseUint(lastIDStr, 10, 32)
+		nextID, err := strconv.ParseUint(nextIDStr, 10, 32)
 		if err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid lastID parameter"})
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid nextID parameter"})
 			return
 		}
-		lastIDUint32 = uint32(lastID)
+		nextIDUint32 = uint32(nextID)
 	}
 
-	products, pagination, err := h.Service.ListProducts(c.Request.Context(), filters, pageSize, lastIDUint32)
+	prevIDStr := c.Query("prev")
+	var prevIDUint32 uint32
+	if prevIDStr == "" {
+		prevIDUint32 = 0
+	} else {
+		prevID, err := strconv.ParseUint(prevIDStr, 10, 32)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid prevID parameter"})
+			return
+		}
+		prevIDUint32 = uint32(prevID)
+	}
+	products, pagination, err := h.Service.ListProducts(c.Request.Context(), filters, pageSize, nextIDUint32, prevIDUint32)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch products"})
 		return

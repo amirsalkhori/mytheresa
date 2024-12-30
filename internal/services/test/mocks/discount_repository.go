@@ -22,6 +22,11 @@ func (m *MockDiscountRepository) GetAllDiscounts() ([]domain.Discount, error) {
 	return args.Get(0).([]domain.Discount), args.Error(1)
 }
 
+func (m *MockDiscountRepository) GetDiscountsBySKUAndCategory(ctx context.Context, identifier string) (domain.Discount, error) {
+	args := m.Called(ctx, identifier)
+	return args.Get(0).(domain.Discount), args.Error(1)
+}
+
 type MockCache struct {
 	mock.Mock
 }

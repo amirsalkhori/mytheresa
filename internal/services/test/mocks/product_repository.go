@@ -16,7 +16,7 @@ func (m *MockProductRepository) CreateProduct(ctx context.Context, product domai
 	return args.Get(0).(domain.Product), args.Error(1)
 }
 
-func (m *MockProductRepository) ListProducts(ctx context.Context, filters map[string]interface{}, pageSize int, lastID uint32) ([]domain.Product, domain.Pagination, error) {
-	args := m.Called(ctx, filters, pageSize, lastID)
+func (m *MockProductRepository) ListProducts(ctx context.Context, filters map[string]interface{}, pageSize int, nextID, prevID uint32) ([]domain.Product, domain.Pagination, error) {
+	args := m.Called(ctx, filters, pageSize, nextID, prevID)
 	return args.Get(0).([]domain.Product), args.Get(1).(domain.Pagination), args.Error(2)
 }

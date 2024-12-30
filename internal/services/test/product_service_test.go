@@ -3,7 +3,6 @@ package services_test
 import (
 	"context"
 	"errors"
-	"fmt"
 	"mytheresa/internal/domain"
 	"mytheresa/internal/ports"
 	"mytheresa/internal/services"
@@ -74,7 +73,6 @@ var _ = ginkgo.Describe("ProductService", func() {
 	ginkgo.Describe("ListProducts", func() {
 		ginkgo.It("returns products with discounts applied", func() {
 			percentage := "20%"
-			fmt.Println("mockProduct2", mockProduct2)
 			expectedProducts := []domain.ProductDiscount{
 				{
 					SKU:      "000001",
@@ -99,8 +97,8 @@ var _ = ginkgo.Describe("ProductService", func() {
 					},
 				},
 			}
-			mockRepo.On("ListProducts", mock.Anything, mock.Anything, mock.Anything, mock.Anything).
-				Return([]domain.Product{mockProduct, mockProduct2}, domain.Pagination{Page: 1, PageSize: 2}, nil).
+			mockRepo.On("ListProducts", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+				Return([]domain.Product{mockProduct, mockProduct2}, domain.Pagination{Next: 1, Prev: 3, PageSize: 2}, nil).
 				Once()
 
 			mockDiscountService.On("GetBestDiscount", mock.Anything, "000001", "boots").
@@ -113,9 +111,10 @@ var _ = ginkgo.Describe("ProductService", func() {
 
 			filters := map[string]interface{}{"category": "boots"}
 			pageSize := 5
-			lastID := uint32(0)
+			nextID := uint32(0)
+			prevID := uint32(0)
 
-			result, paginationResult, err := productService.ListProducts(ctx, filters, pageSize, lastID)
+			result, paginationResult, err := productService.ListProducts(ctx, filters, pageSize, nextID, prevID)
 
 			gomega.Expect(err).To(gomega.BeNil())
 			gomega.Expect(result[0].Price).To(gomega.Equal(expectedProducts[0].Price))
@@ -123,7 +122,7 @@ var _ = ginkgo.Describe("ProductService", func() {
 			gomega.Expect(result[1].Price.Final).To(gomega.Equal(expectedProducts[1].Price.Original))
 			gomega.Expect(result[1].Price.DiscountPercentage).To(gomega.Equal(expectedProducts[1].Price.DiscountPercentage))
 			gomega.Expect(result[1].Price.DiscountPercentage).To(gomega.BeNil())
-			gomega.Expect(paginationResult.Page).To(gomega.Equal(uint32(1)))
+			gomega.Expect(paginationResult.PageSize).To(gomega.Equal(uint32(2)))
 
 			mockRepo.AssertExpectations(ginkgo.GinkgoT())
 			mockDiscountService.AssertExpectations(ginkgo.GinkgoT())
