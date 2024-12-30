@@ -51,6 +51,10 @@ func (h *ProductHandler) GetFilteredProducts(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
+	if pageSize > 5 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Pagesize can not be more than 5"})
+		return
+	}
 	nextIDStr := c.Query("next")
 	var nextIDUint32 uint32
 	if nextIDStr == "" {
