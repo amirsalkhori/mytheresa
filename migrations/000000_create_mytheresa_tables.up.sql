@@ -24,7 +24,7 @@ CREATE TABLE discounts
     id   INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     type ENUM('category', 'sku') NOT NULL,
     identifier VARCHAR(50) NOT NULL,
-    percentage FLOAT NOT NULL,
+    percentage INT UNSIGNED NOT NULL,
     INDEX idx_type (type), 
     INDEX idx_identifier (identifier), 
     INDEX idx_percentage (percentage)     

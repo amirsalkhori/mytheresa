@@ -12,6 +12,8 @@ services:
      depends_on:
        - db
        - redis 
+     networks:
+      - mytheresa-network
 
   db:
     build:
@@ -27,6 +29,8 @@ services:
       - "13306:3306"
     volumes:
       - mysql-data:/var/lib/mysql
+    networks:
+      - mytheresa-network
   
   redis:
     image: redis:latest
@@ -36,8 +40,14 @@ services:
     ports:
       - "6379:6379"
     restart: always
+    networks:
+      - mytheresa-network
 
 
 volumes:
   mysql-data:
   redis_data:
+
+
+networks:
+  mytheresa-network:

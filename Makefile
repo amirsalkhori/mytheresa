@@ -23,4 +23,4 @@ tidy:
 test-repository:
 	TEST_TYPE=integration go test ./internal/infra/db/mysql/repository... -v
 seed-products:
-	go run ./path/to/seed_script.go
+	@go run ./cmd/seeder/main.go --categories=$(CATEGORIES) --products=$(PRODUCTS) --discounts=$(DISCOUNTS)
