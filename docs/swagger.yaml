@@ -7,7 +7,7 @@ servers:
   - url: http://localhost:8080
     description: Local server
 paths:
-  /products:
+  /v1/products:
     get:
       summary: Fetch products with filters and pagination
       description: Retrieve a list of products filtered by category and price, with pagination.

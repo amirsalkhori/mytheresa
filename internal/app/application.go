@@ -34,7 +34,7 @@ func StartApplication() {
 	productHandler := handler.NewProductHandler(productService, hashIDSalt)
 
 	r := gin.Default()
-	r.GET("/products", productHandler.GetFilteredProducts)
+	r.GET("/v1/products", productHandler.GetFilteredProducts)
 
 	if err := r.Run(":8080"); err != nil {
 		log.Fatalf("failed to start server: %v", err)
