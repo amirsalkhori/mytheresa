@@ -66,7 +66,11 @@ func (s ProductService) ListProducts(ctx context.Context, filters map[string]int
 		nextHashID, _ = s.Hashids.EncodeInt64([]int64{int64(pagination.Next)})
 	}
 	if pagination.Prev > 0 {
-		prevHashID, _ = s.Hashids.EncodeInt64([]int64{int64(pagination.Prev)})
+		if pagination.Prev == 1 {
+			prevHashID = ""
+		} else {
+			prevHashID, _ = s.Hashids.EncodeInt64([]int64{int64(pagination.Prev)})
+		}
 	}
 
 	hashedPagination := domain.HashedPagination{

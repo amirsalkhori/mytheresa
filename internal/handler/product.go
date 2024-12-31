@@ -1,11 +1,7 @@
 package handler
 
 import (
-	"context"
 	"fmt"
-	"log"
-	"mytheresa/internal/app/dto"
-	"mytheresa/internal/domain"
 	"mytheresa/internal/ports"
 	"strconv"
 
@@ -26,22 +22,6 @@ func NewProductHandler(service ports.ProductService, salt string) *ProductHandle
 	hd.MinLength = 6
 	hashid, _ := hashids.NewWithData(hd)
 	return &ProductHandler{Service: service, hashids: hashid}
-}
-
-func (h *ProductHandler) CreateProducts(ctx context.Context, productsRoot dto.ProductsRoot) {
-	for _, product := range productsRoot.Products {
-		productDomain := domain.Product{
-			SKU:  product.SKU,
-			Name: product.Name,
-			// Category: product.Category,
-			Price: uint32(product.Price),
-		}
-		_, err := h.Service.CreateProduct(ctx, productDomain)
-		if err != nil {
-			fmt.Println("Could not create product")
-		}
-	}
-	log.Println("Products have been successfully stored DB.")
 }
 
 func (h *ProductHandler) GetFilteredProducts(c *gin.Context) {
