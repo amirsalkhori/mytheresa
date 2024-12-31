@@ -32,7 +32,5 @@ env:
 tidy:
 	go mod tidy
 
-test-repository:
-	TEST_TYPE=integration go test ./internal/infra/db/mysql/repository... -v
 seed-products:
 	@go run ./cmd/seeder/main.go  --products=$(PRODUCTS) --discounts=$(DISCOUNTS)
