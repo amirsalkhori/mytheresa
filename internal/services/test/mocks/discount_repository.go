@@ -12,19 +12,9 @@ type MockDiscountRepository struct {
 	mock.Mock
 }
 
-func (m *MockDiscountRepository) CreateDiscount(ctx context.Context, discount domain.Discount) (domain.Discount, error) {
-	args := m.Called(ctx, discount)
-	return args.Get(0).(domain.Discount), args.Error(1)
-}
-
-func (m *MockDiscountRepository) GetAllDiscounts() ([]domain.Discount, error) {
-	args := m.Called()
+func (m *MockDiscountRepository) GetDiscountsBySKUAndCategory(ctx context.Context, SKU, categoryName string) ([]domain.Discount, error) {
+	args := m.Called(ctx, SKU, categoryName)
 	return args.Get(0).([]domain.Discount), args.Error(1)
-}
-
-func (m *MockDiscountRepository) GetDiscountsBySKUAndCategory(ctx context.Context, identifier string) (domain.Discount, error) {
-	args := m.Called(ctx, identifier)
-	return args.Get(0).(domain.Discount), args.Error(1)
 }
 
 type MockCache struct {

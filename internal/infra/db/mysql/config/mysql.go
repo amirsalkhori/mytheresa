@@ -21,9 +21,9 @@ type MySQLRepository struct {
 
 func NewMySQLRepository(cfg *configs.Config) (*MySQLRepository, error) {
 	// Run migrations
-	if err := runMigrations(&cfg.Mysql); err != nil {
-		return nil, err
-	}
+	// if err := runMigrations(&cfg.Mysql); err != nil {
+	// 	return nil, err
+	// }
 
 	dsn := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8&parseTime=True&loc=Local",
 		cfg.Mysql.User,

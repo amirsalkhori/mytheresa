@@ -28,21 +28,24 @@ func (r DiscountRepository) CreateDiscount(ctx context.Context, disocunt domain.
 	return model.ToDomainDiscount(modelDiscount), nil
 }
 
-func (r DiscountRepository) GetDiscountsBySKUAndCategory(ctx context.Context, identifier string) (domain.Discount, error) {
-	var modelDiscount model.Discount
+func (r DiscountRepository) GetDiscountsBySKUAndCategory(ctx context.Context, SKU, categoryName string) ([]domain.Discount, error) {
+	var modelDiscount []model.Discount
+	query := r.DB.Model(&model.Discount{}).Preload("Category")
 
-	err := r.DB.Table("discounts").
-		Where("discounts.identifier = ? ", identifier).
-		Order("discounts.percentage DESC").
-		Limit(1).
-		Scan(&modelDiscount).Error
-	if err != nil {
-		if err == gorm.ErrRecordNotFound {
-			return domain.Discount{}, nil
-		}
-		return domain.Discount{}, err
+	if categoryName != "" {
+		query.Joins("JOIN categories c ON c.id = discounts.category_id")
+		query.Where("c.name = ?", categoryName)
 	}
-	return model.ToDomainDiscount(modelDiscount), nil
+
+	if SKU != "" {
+		query.Where("discounts.sku <= ?", SKU)
+	}
+
+	if err := query.Find(&modelDiscount).Error; err != nil {
+		log.Printf("Failed to get discounts: %v", err)
+		return nil, err
+	}
+	return model.ToDomainDiscounts(modelDiscount), nil
 }
 
 func (r DiscountRepository) GetAllDiscounts() ([]domain.Discount, error) {

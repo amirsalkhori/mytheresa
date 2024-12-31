@@ -9,7 +9,6 @@ import (
 )
 
 func main() {
-	categoriesCount := flag.Int("categories", 10, "Number of categories to create")
 	productsCount := flag.Int("products", 100, "Number of products to create")
 	discountsCount := flag.Int("discounts", 50, "Number of discounts to create")
 	flag.Parse()
@@ -28,7 +27,7 @@ func main() {
 
 	seederService := services.NewSeederService(repo)
 
-	if err := seederService.SeedCategories(*categoriesCount); err != nil {
+	if err := seederService.SeedCategories(); err != nil {
 		log.Fatalf("Error seeding categories: %v", err)
 	}
 	if err := seederService.SeedProducts(*productsCount); err != nil {

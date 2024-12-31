@@ -2,7 +2,8 @@ package domain
 
 type Discount struct {
 	ID         uint32
-	Type       string
-	Identifier string
+	SKU        string
 	Percentage uint8
+	CategoryID uint32
+	Category   Category
 }

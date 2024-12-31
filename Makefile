@@ -1,6 +1,6 @@
 
 test:
-	go test -v ./...
+	ginkgo -r
 up:
 	docker-compose up -d;
 build-up:
@@ -23,4 +23,4 @@ tidy:
 test-repository:
 	TEST_TYPE=integration go test ./internal/infra/db/mysql/repository... -v
 seed-products:
-	@go run ./cmd/seeder/main.go --categories=$(CATEGORIES) --products=$(PRODUCTS) --discounts=$(DISCOUNTS)
+	@go run ./cmd/seeder/main.go  --products=$(PRODUCTS) --discounts=$(DISCOUNTS)

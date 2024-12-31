@@ -22,29 +22,30 @@ CREATE TABLE products
 CREATE TABLE discounts
 (
     id   INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    type ENUM('category', 'sku') NOT NULL,
-    identifier VARCHAR(50) NOT NULL,
+    sku VARCHAR(50) NOT NULL,
+    category_id INT UNSIGNED NOT NULL,
     percentage INT UNSIGNED NOT NULL,
-    INDEX idx_type (type), 
-    INDEX idx_identifier (identifier), 
-    INDEX idx_percentage (percentage)     
+    INDEX idx_percentage (percentage),
+    INDEX idx_sku (sku),
+    constraint fk_categories_discounts
+        foreign key (category_id) references categories (id)       
 );
 
--- -- Inserting cateegories
-INSERT INTO categories (name) VALUES
-('boots'),
-('sneakers'),
-('sandals');
+-- -- -- Inserting cateegories
+-- INSERT INTO categories (name) VALUES
+-- ('boots'),
+-- ('sneakers'),
+-- ('sandals');
 
--- -- Inserting products
-INSERT INTO products (sku, name, price, category_id) VALUES
-('000001', 'BV Lean leather ankle boots', 89000, 1),
-('000002', 'BV Lean leather ankle boots', 99000, 1),
-('000003', 'Ashlington leather ankle boots', 71000, 1),
-('000004', 'Naima embellished suede sandals', 79500, 2),
-('000005', 'Nathane leather sneakers', 59000, 3);
+-- -- -- Inserting products
+-- INSERT INTO products (sku, name, price, category_id) VALUES
+-- ('000001', 'BV Lean leather ankle boots', 89000, 1),
+-- ('000002', 'BV Lean leather ankle boots', 99000, 1),
+-- ('000003', 'Ashlington leather ankle boots', 71000, 1),
+-- ('000004', 'Naima embellished suede sandals', 79500, 2),
+-- ('000005', 'Nathane leather sneakers', 59000, 3);
 
--- -- Inserting discounts
-INSERT INTO discounts (type, identifier, percentage) VALUES
-('sku', '000003', 15),
-('category', 'boots', 30);
+-- -- -- Inserting discounts
+-- INSERT INTO discounts (type, identifier, percentage) VALUES
+-- ('sku', '000003', 15),
+-- ('category', 'boots', 30);
