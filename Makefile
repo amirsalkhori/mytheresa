@@ -1,3 +1,15 @@
+run:
+	APP_NAME=mytheresa \
+    MYTHERESA_MYSQL_HOST=127.0.0.1 \
+    MYTHERESA_MYSQL_PORT=13306 \
+    MYTHERESA_MYSQL_USER=mytheresa \
+    MYTHERESA_MYSQL_PASSWORD=mytheresa \
+    MYTHERESA_MYSQL_DB=mytheresa \
+    MYTHERESA_REDIS_HOST=127.0.0.1 \
+    MYTHERESA_REDIS_PORT=6379 \
+    MYTHERESA_REDIS_PASSWORD= \
+    HASH_ID_SAlT=mytheresa-salt-value \
+    go run cmd/mytheresa/main.go
 
 test:
 	ginkgo -r
