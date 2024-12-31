@@ -16,9 +16,8 @@ RUN echo "start build"
 WORKDIR /app/cmd/mytheresa
 RUN go build -o /app/main .
 
-# Copy migration files from the root directory
-WORKDIR /home/app
-COPY ./migrations /home/app/migrations
+# Copy migration files to runtime directory
+COPY ./migrations /app/migrations
 
 # Verify the binary is created
 RUN ls -la $BIN
@@ -30,8 +29,9 @@ FROM debian:bookworm-slim
 # Set the working directory for the runtime container
 WORKDIR /app
 
-# Copy the compiled binary from the builder stage
+# Copy the compiled binary and migrations from the builder stage
 COPY --from=builder /app/main .
+COPY --from=builder /app/migrations ./migrations
 
 # Expose the port the application will run on
 EXPOSE 8080

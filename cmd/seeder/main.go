@@ -15,7 +15,7 @@ func main() {
 
 	cfg := configs.GetConfig()
 	cfg.Mysql.Host = "127.0.0.1"
-	cfg.Mysql.Port = 13306
+	cfg.Mysql.Port = 3306
 	cfg.Mysql.User = "mytheresa"
 	cfg.Mysql.Pass = "mytheresa"
 	cfg.Mysql.Name = "mytheresa"
