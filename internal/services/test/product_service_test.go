@@ -2,7 +2,6 @@ package services_test
 
 import (
 	"context"
-	"errors"
 	"mytheresa/internal/domain"
 	"mytheresa/internal/ports"
 	"mytheresa/internal/services"
@@ -19,8 +18,8 @@ var _ = ginkgo.Describe("ProductService", func() {
 		mockDiscountService *mocks.MockDiscountService
 		productService      ports.ProductService
 		ctx                 context.Context
-		mockProduct         domain.Product
-		mockProduct2        domain.Product
+		mockProducts        []domain.Product
+		mockCategories      []domain.Category
 	)
 
 	ginkgo.BeforeEach(func() {
@@ -28,53 +27,40 @@ var _ = ginkgo.Describe("ProductService", func() {
 		mockDiscountService = new(mocks.MockDiscountService)
 		productService = services.NewProductService(mockRepo, mockDiscountService, "mytheresa-salt-value")
 		ctx = context.Background()
-		mockProduct = domain.Product{
-			ID:   1,
-			SKU:  "000001",
-			Name: "BV Lean leather ankle boots",
-			// Category: "boots",
-			Price:    89000,
-			Currency: "EUR",
+
+		mockCategories = []domain.Category{
+			{ID: 1, Name: "boots"},
+			{ID: 2, Name: "sneakers"},
 		}
-		mockProduct2 = domain.Product{
-			ID:   2,
-			SKU:  "000002",
-			Name: "Nathane leather sneakers",
-			// Category: "sneakers",
-			Price:    88000,
-			Currency: "EUR",
+
+		mockProducts = []domain.Product{
+			{
+				ID:         1,
+				SKU:        "000001",
+				Name:       "BV Lean leather ankle boots",
+				Category:   mockCategories[0],
+				CategoryID: 1,
+				Price:      89000,
+				Currency:   "EUR",
+			},
+			{
+				ID:         2,
+				SKU:        "000002",
+				Name:       "Nathane leather sneakers",
+				Category:   mockCategories[1],
+				CategoryID: 2,
+				Price:      88000,
+				Currency:   "EUR",
+			},
 		}
-	})
-
-	ginkgo.Describe("CreateProduct", func() {
-		ginkgo.It("creates a product successfully", func() {
-			mockRepo.On("CreateProduct", mock.Anything, mockProduct).Return(mockProduct, nil).Once()
-
-			result, err := productService.CreateProduct(ctx, mockProduct)
-
-			gomega.Expect(err).To(gomega.BeNil())
-			gomega.Expect(result).To(gomega.Equal(mockProduct))
-
-			mockRepo.AssertExpectations(ginkgo.GinkgoT())
-		})
-
-		ginkgo.It("returns an error when repository call fails", func() {
-			mockRepo.On("CreateProduct", mock.Anything, mockProduct).Return(domain.Product{}, errors.New("repo error")).Once()
-
-			result, err := productService.CreateProduct(ctx, mockProduct)
-
-			gomega.Expect(err).To(gomega.MatchError("repo error"))
-			gomega.Expect(result).To(gomega.Equal(domain.Product{}))
-
-			mockRepo.AssertExpectations(ginkgo.GinkgoT())
-		})
 	})
 
 	ginkgo.Describe("ListProducts", func() {
-		ginkgo.It("returns products with discounts applied", func() {
+		ginkgo.It("returns products with discounts applied and correct pagination", func() {
 			percentage := "20%"
 			expectedProducts := []domain.ProductDiscount{
 				{
+					ID:       1,
 					SKU:      "000001",
 					Name:     "BV Lean leather ankle boots",
 					Category: "boots",
@@ -86,6 +72,7 @@ var _ = ginkgo.Describe("ProductService", func() {
 					},
 				},
 				{
+					ID:       2,
 					SKU:      "000002",
 					Name:     "Nathane leather sneakers",
 					Category: "sneakers",
@@ -97,32 +84,41 @@ var _ = ginkgo.Describe("ProductService", func() {
 					},
 				},
 			}
-			mockRepo.On("ListProducts", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
-				Return([]domain.Product{mockProduct, mockProduct2}, domain.HashedPagination{Next: "Ra2dkD", Prev: "Vbgobn", PageSize: 2}, nil).
-				Once()
 
-			mockDiscountService.On("GetBestDiscount", mock.Anything, "000001", "boots").
-				Return(domain.Discount{ID: 1, Percentage: 20}, nil).
-				Once()
+			paginationResult := domain.HashedPagination{
+				Next:     "WYxok8",
+				Prev:     "Ra2dkD",
+				PageSize: 5,
+			}
 
-			mockDiscountService.On("GetBestDiscount", mock.Anything, "000002", "sneakers").
-				Return(domain.Discount{}, nil). // No discount for the second product
-				Once()
+			mockRepo.On("ListProducts", ctx, mock.Anything, 5, uint32(2), uint32(5)).
+				Return(mockProducts, domain.Pagination{
+					Next:     2,
+					Prev:     5,
+					PageSize: 5,
+				}, nil).Once()
+
+			mockDiscountService.On("GetBestDiscount", ctx, "000001", "boots").
+				Return(domain.Discount{ID: 1, Percentage: 20}, nil).Once()
+
+			mockDiscountService.On("GetBestDiscount", ctx, "000002", "sneakers").
+				Return(domain.Discount{}, nil).Once()
 
 			filters := map[string]interface{}{"category": "boots"}
 			pageSize := 5
-			nextID := uint32(0)
-			prevID := uint32(0)
+			nextID := uint32(2)
+			prevID := uint32(5)
 
-			result, paginationResult, err := productService.ListProducts(ctx, filters, pageSize, nextID, prevID)
+			result, pagination, err := productService.ListProducts(ctx, filters, pageSize, nextID, prevID)
 
 			gomega.Expect(err).To(gomega.BeNil())
+			gomega.Expect(result).To(gomega.Equal(expectedProducts))
+			gomega.Expect(pagination).To(gomega.Equal(paginationResult))
 			gomega.Expect(result[0].Price).To(gomega.Equal(expectedProducts[0].Price))
 			gomega.Expect(result[0].Price.Final).To(gomega.Equal(expectedProducts[0].Price.Final))
 			gomega.Expect(result[1].Price.Final).To(gomega.Equal(expectedProducts[1].Price.Original))
 			gomega.Expect(result[1].Price.DiscountPercentage).To(gomega.Equal(expectedProducts[1].Price.DiscountPercentage))
 			gomega.Expect(result[1].Price.DiscountPercentage).To(gomega.BeNil())
-			gomega.Expect(paginationResult.PageSize).To(gomega.Equal(uint32(2)))
 
 			mockRepo.AssertExpectations(ginkgo.GinkgoT())
 			mockDiscountService.AssertExpectations(ginkgo.GinkgoT())

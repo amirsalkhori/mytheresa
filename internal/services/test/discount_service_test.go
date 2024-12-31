@@ -22,11 +22,9 @@ var _ = ginkgo.Describe("DiscountService", func() {
 		mockCache        *mocks.MockCache
 		discountService  services.DiscountService
 		ctx              context.Context
-		// mockDiscount     domain.Discount
-		// discountID uint32
-		// discountType       string
-		// discountIdentifier string
-		// discountPercentage uint8
+		mockDiscount1    domain.Discount
+		mockDiscount2    domain.Discount
+		mockCategory     domain.Category
 	)
 
 	ginkgo.BeforeEach(func() {
@@ -37,38 +35,53 @@ var _ = ginkgo.Describe("DiscountService", func() {
 			Redis: mockCache,
 		}
 		ctx = context.Background()
-		// discountID = 1
-		// discountType = "category"
-		// discountIdentifier = "boots"
-		// discountPercentage = 30
-		// mockDiscount = domain.Discount{
-		// ID: discountID,
-		// Type:       discountType,
-		// Identifier: discountIdentifier,
-		// 	Percentage: discountPercentage,
-		// }
+		mockCategory = domain.Category{
+			ID:   1,
+			Name: "boots",
+		}
+		mockDiscount1 = domain.Discount{
+			ID:         1,
+			Category:   mockCategory,
+			CategoryID: 1,
+			Percentage: 30,
+		}
+		mockDiscount2 = domain.Discount{
+			ID:         2,
+			SKU:        "000001",
+			Percentage: 40,
+		}
 	})
 
 	ginkgo.Describe("GetBestDiscount", func() {
 		ginkgo.It("should return the best discount when both sku and category discounts are found", func() {
-			// discount := mockDiscount
-			mockCache.On("Get", ctx, "discount_category_boots").Return(`{"ID": 6, "Percentage": 30}`, nil)
-			mockCache.On("Get", ctx, "discount_sku_").Return(`{"ID": 5, "Percentage": 20}`, nil)
+			categoryDiscount := `{"ID": 1, "Percentage": 30, "CategoryID": 1, "Category": {"Name": "boots"}}`
+			skuDiscount := `{"ID": 2, "Percentage": 40, "SKU": "000001"}`
 
-			// bestDiscount, err := discountService.GetBestDiscount(ctx, "", discount.Identifier)
+			mockCache.On("Get", ctx, "discount:category:boots").Return(categoryDiscount, nil).Once()
+			mockCache.On("Get", ctx, "discount:sku:000001").Return(skuDiscount, nil).Once()
 
-			// gomega.Expect(err).NotTo(gomega.HaveOccurred())
-			// gomega.Expect(bestDiscount.Percentage).To(gomega.Equal(uint8(30)))
+			bestDiscount, err := discountService.GetBestDiscount(ctx, mockDiscount2.SKU, mockDiscount1.Category.Name)
+
+			gomega.Expect(err).NotTo(gomega.HaveOccurred(), "Expected no error from GetBestDiscount")
+			gomega.Expect(bestDiscount.Percentage).To(gomega.Equal(uint8(40)), "Expected the best discount percentage to be 40")
+			gomega.Expect(bestDiscount.ID).To(gomega.Equal(uint32(2)), "Expected the best discount ID to be 2")
+			gomega.Expect(bestDiscount.SKU).To(gomega.Equal(mockDiscount2.SKU), "Expected the SKU to match mockDiscount2.SKU")
 		})
 
 		ginkgo.It("should return an empty discount when no discount is found for both sku and category", func() {
-			mockCache.On("Get", ctx, "discount_sku_000001").Return("", nil)
-			mockCache.On("Get", ctx, "discount_category_hats").Return("", nil)
 
-			bestDiscount, err := discountService.GetBestDiscount(ctx, "000001", "hats")
+			categoryDiscount := `{}`
+			skuDiscount := `{}`
+
+			mockCache.On("Get", ctx, "discount:category:hats").Return(categoryDiscount, nil).Once()
+			mockCache.On("Get", ctx, "discount:sku:000002").Return(skuDiscount, nil).Once()
+
+			bestDiscount, err := discountService.GetBestDiscount(ctx, "000002", "hats")
 
 			gomega.Expect(err).NotTo(gomega.HaveOccurred())
 			gomega.Expect(bestDiscount).To(gomega.Equal(domain.Discount{}))
+			gomega.Expect(bestDiscount.ID).To(gomega.Equal(uint32(0)))
+			gomega.Expect(bestDiscount.ID).To(gomega.Equal(uint32(0)))
 		})
 	})
 })

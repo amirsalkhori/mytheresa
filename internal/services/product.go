@@ -23,10 +23,6 @@ func NewProductService(repo ports.ProductRepository, discountService ports.Disco
 	return &ProductService{Repo: repo, DiscountService: discountService, Hashids: hashid}
 }
 
-func (s *ProductService) CreateProduct(ctx context.Context, product domain.Product) (domain.Product, error) {
-	return s.Repo.CreateProduct(ctx, product)
-}
-
 func (s ProductService) ListProducts(ctx context.Context, filters map[string]interface{}, pageSize int, nextID, prevID uint32) ([]domain.ProductDiscount, domain.HashedPagination, error) {
 	products, pagination, err := s.Repo.ListProducts(ctx, filters, pageSize, nextID, prevID)
 	if err != nil {

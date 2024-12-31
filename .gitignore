@@ -71,3 +71,5 @@ goinstall.log
 
 cmd/**/__debug_bin*
 
+
+.codegpt

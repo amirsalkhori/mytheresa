@@ -60,7 +60,7 @@ func (s *DiscountService) getDiscountByAttribute(ctx context.Context, key, value
 		if jsonErr := json.Unmarshal([]byte(discountData), &discount); jsonErr == nil {
 			return discount, nil
 		}
-		log.Printf("Failed to unmarshal cached discount data for key %s: %v", redisKey)
+		log.Printf("Failed to unmarshal cached discount data for key %s: %v", redisKey, discountData)
 	}
 
 	sku, category := "", ""
