@@ -1,0 +1,150 @@
+openapi: 3.0.0
+info:
+  title: Mytheresa Product API
+  description: API to fetch products with filtering and pagination.
+  version: 1.0.0
+servers:
+  - url: http://localhost:8080
+    description: Local server
+paths:
+  /products:
+    get:
+      summary: Fetch products with filters and pagination
+      description: Retrieve a list of products filtered by category and price, with pagination.
+      parameters:
+        - name: category
+          in: query
+          description: Filter products by category (e.g., boots, sneakers, sandals).
+          required: false
+          schema:
+            type: string
+        - name: priceLessThan
+          in: query
+          description: Maximum price of the products.
+          required: false
+          schema:
+            type: integer
+        - name: pageSize
+          in: query
+          description: Number of products per page.
+          required: false
+          schema:
+            type: integer
+            default: 5
+        - name: next
+          in: query
+          description: Pagination token to fetch the next page of results.
+          required: false
+          schema:
+            type: string
+        - name: prev
+          in: query
+          description: Pagination token to fetch the previous page of results.
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: A list of products with pagination details.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  pagination:
+                    type: object
+                    properties:
+                      Next:
+                        type: string
+                        description: Token for the next page.
+                      Prev:
+                        type: string
+                        description: Token for the previous page.
+                      PageSize:
+                        type: integer
+                        description: Number of items per page.
+                  products:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        ID:
+                          type: integer
+                          description: Product ID.
+                        SKU:
+                          type: string
+                          description: Product Stock Keeping Unit.
+                        Name:
+                          type: string
+                          description: Product name.
+                        Category:
+                          type: string
+                          description: Product category.
+                        Price:
+                          type: object
+                          properties:
+                            Original:
+                              type: number
+                              description: Original price of the product.
+                            Final:
+                              type: number
+                              description: Final price after discount.
+                            DiscountPercentage:
+                              type: string
+                              description: Discount percentage as a string.
+                            Currency:
+                              type: string
+                              description: Currency of the price.
+              examples:
+                example-1:
+                  value:
+                    pagination:
+                      Next: "4Yl8YQ"
+                      Prev: "Vbgobn"
+                      PageSize: 5
+                    products:
+                      - ID: 1
+                        SKU: "000001"
+                        Name: "Product 1"
+                        Category: "boots"
+                        Price:
+                          Original: 53869
+                          Final: 26935
+                          DiscountPercentage: "50%"
+                          Currency: "EUR"
+                      - ID: 5
+                        SKU: "000005"
+                        Name: "Product 5"
+                        Category: "boots"
+                        Price:
+                          Original: 71785
+                          Final: 35893
+                          DiscountPercentage: "50%"
+                          Currency: "EUR"
+                      - ID: 7
+                        SKU: "000007"
+                        Name: "Product 7"
+                        Category: "boots"
+                        Price:
+                          Original: 34707
+                          Final: 17354
+                          DiscountPercentage: "50%"
+                          Currency: "EUR"
+                      - ID: 9
+                        SKU: "000009"
+                        Name: "Product 9"
+                        Category: "boots"
+                        Price:
+                          Original: 64416
+                          Final: 32208
+                          DiscountPercentage: "50%"
+                          Currency: "EUR"
+                      - ID: 10
+                        SKU: "000010"
+                        Name: "Product 10"
+                        Category: "boots"
+                        Price:
+                          Original: 65583
+                          Final: 32792
+                          DiscountPercentage: "50%"
+                          Currency: "EUR"
