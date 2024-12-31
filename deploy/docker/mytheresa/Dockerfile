@@ -13,7 +13,7 @@ COPY . .
 
 # Build the Go application
 RUN echo "start build"
-WORKDIR /app/cmd
+WORKDIR /app/cmd/mytheresa
 RUN go build -o /app/main .
 
 # Copy migration files from the root directory
