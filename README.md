@@ -153,6 +153,3 @@ This will execute all unit and integration tests and provide a summary of result
 For more details, see [Future Improvements](docs/future.md).
 
 ---
-
-## License
-This project is licensed under the MIT License.
