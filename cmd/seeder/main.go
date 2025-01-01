@@ -9,12 +9,13 @@ import (
 )
 
 func main() {
-	productsCount := flag.Int("products", 100, "Number of products to create")
-	discountsCount := flag.Int("discounts", 50, "Number of discounts to create")
+	categoriesCount := flag.Int("categories", 1000, "Number of categories to create")
+	productsCount := flag.Int("products", 50000, "Number of products to create")
+	discountsCount := flag.Int("discounts", 2000, "Number of discounts to create")
 	flag.Parse()
 
 	cfg := configs.GetConfig()
-	cfg.Mysql.Host = "127.0.0.1"
+	cfg.Mysql.Host = "db"
 	cfg.Mysql.Port = 3306
 	cfg.Mysql.User = "mytheresa"
 	cfg.Mysql.Pass = "mytheresa"
@@ -27,7 +28,7 @@ func main() {
 
 	seederService := services.NewSeederService(repo)
 
-	if err := seederService.SeedCategories(); err != nil {
+	if err := seederService.SeedCategories(*categoriesCount); err != nil {
 		log.Fatalf("Error seeding categories: %v", err)
 	}
 	if err := seederService.SeedProducts(*productsCount); err != nil {

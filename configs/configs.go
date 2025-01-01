@@ -16,6 +16,7 @@ type Config struct {
 
 type App struct {
 	Name string `yaml:"name" mapstructure:"name"`
+	ENV  string `yaml:"name" mapstructure:"env"`
 }
 
 type Mysql struct {
@@ -49,6 +50,7 @@ func GetConfig() Config {
 
 	c.App = App{
 		Name: v.GetString("app.name"),
+		ENV:  v.GetString("app.env"),
 	}
 
 	return c
@@ -57,6 +59,7 @@ func GetConfig() Config {
 func bindEnv(v *viper.Viper) {
 	envBindings := map[string]string{
 		"app.name":       "APP_NAME",
+		"app.env":        "APP_ENV",
 		"mysql.host":     "MYTHERESA_MYSQL_HOST",
 		"mysql.port":     "MYTHERESA_MYSQL_PORT",
 		"mysql.username": "MYTHERESA_MYSQL_USER",

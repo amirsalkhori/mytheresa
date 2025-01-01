@@ -15,6 +15,8 @@ test:
 	ginkgo -r
 up:
 	docker-compose up -d;
+build:
+	docker-compose up --build;
 build-up:
 	docker-compose up --build -d;
 ps:
@@ -33,4 +35,9 @@ tidy:
 	go mod tidy
 
 seed-products:
-	@go run ./cmd/seeder/main.go  --products=$(PRODUCTS) --discounts=$(DISCOUNTS)
+	docker-compose exec app /app/seeder 
+	# @go run ./cmd/seeder/main.go  --products=$(PRODUCTS) --discounts=$(DISCOUNTS)
+
+test-ginkgo:
+	docker build --progress=plain -t ginktest -f deploy/docker/mytheresa/Dockerfile-test .
+	docker run --rm -it ginktest

@@ -21,11 +21,12 @@ func NewSeederService(repo *mysql.MySQLRepository) *SeederService {
 }
 
 // Seed predefined categories
-func (s *SeederService) SeedCategories() error {
-	categories := []map[string]interface{}{
-		{"name": "boots"},
-		{"name": "sandals"},
-		{"name": "sneakers"},
+func (s *SeederService) SeedCategories(count int) error {
+	var categories []map[string]interface{}
+	for i := 1; i <= count; i++ {
+		categories = append(categories, map[string]interface{}{
+			"name": fmt.Sprintf("Category %d", i),
+		})
 	}
 
 	if err := s.DB.Table("categories").CreateInBatches(categories, 100).Error; err != nil {
@@ -33,7 +34,7 @@ func (s *SeederService) SeedCategories() error {
 		return err
 	}
 
-	log.Printf("Successfully seeded predefined categories")
+	log.Printf("Successfully seeded 4000 categories")
 	return nil
 }
 

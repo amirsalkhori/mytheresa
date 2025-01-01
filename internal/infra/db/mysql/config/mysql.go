@@ -21,7 +21,7 @@ type MySQLRepository struct {
 
 func NewMySQLRepository(cfg *configs.Config) (*MySQLRepository, error) {
 	// Run migrations
-	if err := runMigrations(&cfg.Mysql); err != nil {
+	if err := runMigrations(cfg); err != nil {
 		return nil, err
 	}
 
@@ -46,13 +46,13 @@ func NewMySQLRepository(cfg *configs.Config) (*MySQLRepository, error) {
 	}, nil
 }
 
-func runMigrations(cfg *configs.Mysql) error {
+func runMigrations(cfg *configs.Config) error {
 	dsn := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8&parseTime=True&loc=Local&multiStatements=true",
-		cfg.User,
-		cfg.Pass,
-		cfg.Host,
-		cfg.Port,
-		cfg.Name,
+		cfg.Mysql.User,
+		cfg.Mysql.Pass,
+		cfg.Mysql.Host,
+		cfg.Mysql.Port,
+		cfg.Mysql.Name,
 	)
 
 	db, err := sql.Open("mysql", dsn)
@@ -69,7 +69,7 @@ func runMigrations(cfg *configs.Mysql) error {
 
 	// Create a new migration instance
 	m, err := migrate.NewWithDatabaseInstance(
-		"file://./migrations",
+		migrationsPath(cfg.App.ENV),
 		"mysql", driver)
 	if err != nil {
 		return fmt.Errorf("failed to create migration instance: %w", err)
@@ -84,4 +84,11 @@ func runMigrations(cfg *configs.Mysql) error {
 	fmt.Println("Migrations run successfully")
 
 	return nil
+}
+
+func migrationsPath(env string) string {
+	if env == "local" {
+		return "file://../../migrations"
+	}
+	return "file://./migrations"
 }
