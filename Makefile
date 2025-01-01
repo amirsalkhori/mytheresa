@@ -1,15 +1,3 @@
-run:
-	APP_NAME=mytheresa \
-    MYTHERESA_MYSQL_HOST=127.0.0.1 \
-    MYTHERESA_MYSQL_PORT=3306 \
-    MYTHERESA_MYSQL_USER=mytheresa \
-    MYTHERESA_MYSQL_PASSWORD=mytheresa \
-    MYTHERESA_MYSQL_DB=mytheresa \
-    MYTHERESA_REDIS_HOST=127.0.0.1 \
-    MYTHERESA_REDIS_PORT=6379 \
-    MYTHERESA_REDIS_PASSWORD= \
-    HASH_ID_SAlT=mytheresa-salt-value \
-    go run cmd/mytheresa/main.go
 up:
 	docker-compose up -d;
 build:
@@ -36,5 +24,5 @@ seed-products:
 	# @go run ./cmd/seeder/main.go  --products=$(PRODUCTS) --discounts=$(DISCOUNTS)
 
 test-ginkgo:
-	docker build --progress=plain -t ginktest -f deploy/docker/mytheresa/Dockerfile-test .
+	docker build --progress=plain -t ginktest -f deploy/docker/mytheresa/test.Dockerfile .
 	docker run --rm -it ginktest

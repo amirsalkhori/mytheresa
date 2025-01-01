@@ -48,6 +48,8 @@ go.work.sum
 # env file
 .env
 
+.idea
+
 .nfs.*
 [56789a].out
 *~

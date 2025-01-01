@@ -4,7 +4,7 @@ services:
      container_name: mytheresa-app
      build:
        context: .
-       dockerfile: ./deploy/docker/mytheresa/Dockerfile
+       dockerfile: ./deploy/docker/mytheresa/app.Dockerfile
      ports:
        - 8080:8080
      volumes:

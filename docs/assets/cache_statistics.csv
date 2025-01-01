@@ -1,3 +1,0 @@
-Cache Type,Mean (ms),Median (ms),Max (ms),Min (ms)
-Cold Cache,28.50,33.00,39.00,3.00
-Warm Cache,4.90,6.00,8.00,4.00
