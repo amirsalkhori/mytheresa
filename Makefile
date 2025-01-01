@@ -10,9 +10,6 @@ run:
     MYTHERESA_REDIS_PASSWORD= \
     HASH_ID_SAlT=mytheresa-salt-value \
     go run cmd/mytheresa/main.go
-
-test:
-	ginkgo -r
 up:
 	docker-compose up -d;
 build:
